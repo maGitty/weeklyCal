@@ -1,0 +1,221 @@
+\documentclass[tikz]{standalone}% Does not support leap years.
+
+%% Load needed packages
+\usepackage{lmodern}
+\usepackage{tikz}
+    \usetikzlibrary{positioning}
+\usepackage{ifthen}
+
+%% Create needed conters  
+    \newcounter{ThisYear}
+    \newcounter{NewYearsDay}
+    \newcounter{NewYearsWeek}
+    \newcounter{NumberOfWeeksThisYear}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SET VARIABLES HERE                                         %
+
+% Year number you want to generate the calendar for:
+    \setcounter{ThisYear}{2019}             
+
+% Which day is the January, 1st? (1 for Monday, 2 for Tuesday, etc.)
+    \setcounter{NewYearsDay}{2}
+
+% Which week does January, 1st belongs to?
+    % Choose 52 (sometimes 53) or 1. Week 1 is not necessary the week of Jan, 1st; but *it is the week of Jan, 4th.*)
+    \setcounter{NewYearsWeek}{52}
+
+% How many weeks this year? (Choose 52 or 53, appropriately)
+    \setcounter{NumberOfWeeksThisYear}{52}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Let's begin with messy stuff
+
+    % If Jan, 1st is not on Week #1...
+    \ifthenelse{\value{NewYearsWeek}>51}{
+        \addtocounter{ThisYear}{-1}         % start calendar with the last week of the previous year
+        \stepcounter{NumberOfWeeksThisYear} % increase amount of weeks to generate
+    }{}
+
+    % Following counter is the backbone of the calendar generation.
+    \newcounter{NDOYnumber}             %% Nth Day Of the Year: 1 for Jan, 1st; 2 for Jan, 2nd; etc.
+        % Set the first day of the calendar (i.e. Monday of the first generated week)
+        \ifthenelse{\value{NewYearsDay}=1}{
+            % Monday = Jan, 1st
+            \setcounter{NDOYnumber}{1}
+        }{
+            % Monday belongs to previous year
+            \setcounter{NDOYnumber}{367}
+            \addtocounter{NDOYnumber}{-\value{NewYearsDay}}
+        }
+
+    % Store day's quantieme (1 for Jan, 1st & Feb, 1st, etc.; 17 for Jan, 17th, Feb, 17th, etc.)
+    \newcounter{NDOYquantieme}
+
+    % Store day's month number (1 for Jan, 2 for Feb, etc.)
+    \newcounter{NDOYmonthnumber}
+
+    % Internal counter
+    \newcounter{tempNDOY}
+
+    % Based on `NDOYnumber` value, compute month number and quantieme
+    \newcommand{\NDOYtomonthnumber}{%
+        \setcounter{tempNDOY}{\value{NDOYnumber}}%
+        \setcounter{NDOYmonthnumber}{1}%
+        \ifthenelse{\value{tempNDOY}<32}{%              %% JANUARY
+            \setcounter{NDOYquantieme}{\value{tempNDOY}}%% Set January quantieme
+        }{%
+            \addtocounter{tempNDOY}{-31}%
+            \stepcounter{NDOYmonthnumber}%                  %% FEBRUARY
+            \ifthenelse{\value{tempNDOY}<29}{%
+                \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+            }{%
+                \addtocounter{tempNDOY}{-28}%
+                \stepcounter{NDOYmonthnumber}%                  %% MARCH
+                \ifthenelse{\value{tempNDOY}<32}{%
+                    \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                }{%
+                    \addtocounter{tempNDOY}{-31}%
+                    \stepcounter{NDOYmonthnumber}%                  %% APRIL
+                    \ifthenelse{\value{tempNDOY}<31}{%
+                        \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                    }{%
+                        \addtocounter{tempNDOY}{-30}%
+                        \stepcounter{NDOYmonthnumber}%                  %% MAY
+                        \ifthenelse{\value{tempNDOY}<32}{%
+                            \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                        }{%
+                            \addtocounter{tempNDOY}{-31}%
+                            \stepcounter{NDOYmonthnumber}%                  %% JUNE
+                            \ifthenelse{\value{tempNDOY}<31}{%
+                                \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                            }{%
+                                \addtocounter{tempNDOY}{-30}%
+                                \stepcounter{NDOYmonthnumber}%                  %% JULY
+                                \ifthenelse{\value{tempNDOY}<32}{%
+                                    \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                                }{%
+                                    \addtocounter{tempNDOY}{-31}%
+                                    \stepcounter{NDOYmonthnumber}%                  %% AUGUST
+                                    \ifthenelse{\value{tempNDOY}<32}{%
+                                        \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                                    }{%
+                                        \addtocounter{tempNDOY}{-31}%
+                                        \stepcounter{NDOYmonthnumber}%                  %% SEPTEMBER
+                                        \ifthenelse{\value{tempNDOY}<31}{%
+                                            \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                                        }{%
+                                            \addtocounter{tempNDOY}{-30}%
+                                            \stepcounter{NDOYmonthnumber}%                  %% OCTOBER
+                                            \ifthenelse{\value{tempNDOY}<32}{%
+                                                \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                                            }{%
+                                                \addtocounter{tempNDOY}{-31}%
+                                                \stepcounter{NDOYmonthnumber}%                  %% NOVEMBER
+                                                \ifthenelse{\value{tempNDOY}<31}{%
+                                                    \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+                                                }{%
+                                                    \addtocounter{tempNDOY}{-30}%
+                                                    \stepcounter{NDOYmonthnumber}%                  %% DECEMBER
+                                                    \setcounter{NDOYquantieme}{\value{tempNDOY}}%
+        }}}}}}}}}}}%
+    }
+
+    % Based on previously computed `NDOYmonthnumber` value, return month name
+    \newcommand{\NDOYtomonth}{%
+        \foreach \monthnumber/\monthname in {1/Januar, 2/Februar, 3/März, 4/April, 5/Mai, 6/Juni, 7/Juli, 8/August, 9/September, 10/Oktober, 11/November, 12/Dezember}{%
+            \ifthenelse{\value{NDOYmonthnumber}=\monthnumber}{\monthname}{}%
+        }
+    }
+
+    % 'Smartly' increase `NDOYnumber` value (i.e. reset to 1 after December, 31st)
+    \newcommand{\stepNDOY}{%
+        \ifthenelse{\value{NDOYnumber}=365}{%
+            \setcounter{NDOYnumber}{1}%
+            \stepcounter{ThisYear}
+        }{%
+            \stepcounter{NDOYnumber}%
+        }%
+    }
+
+    % Defines the `tikzpicture` used to print a week (i.e. calendar page)
+    \newcommand{\printweek}[1]{% argument = \value{NDOYnumber}, i.e. Monday's day-of-the-year number
+        \begin{tikzpicture}[%
+            inner sep=3 pt,
+            dayname/.style={%
+                node font=\footnotesize,
+            },
+            daynumber/.style={%
+                anchor=north east,
+                node font=\normalsize\bfseries, 
+            },
+            xscale = 3,
+            yscale=-1.5,% CAUTION: axis direction reversed!
+        ]
+        \NDOYtomonthnumber%(see below)
+        \node (year_number) at (0,1) [anchor = south east, minimum height = 2em] {\theThisYear};    %prints year number
+        \node [base right = 1em of year_number, anchor=base west, node font=\large] {\NDOYtomonth}; %prints month name
+
+        %% Monday
+        \NDOYtomonthnumber                                                              % compute and store which month and quantieme is this day, based on `NDOYnumber` value
+        \node (monday_number) at (0,1) [daynumber] {\theNDOYquantieme};                 % prints quantieme
+        \node [base right = 1em of monday_number, anchor=base west] [dayname] {Montag}; % prints day name
+        \stepNDOY                                                                       % 'smartly' increases `NDOYnumber` value
+
+        %% Tuesday
+        \NDOYtomonthnumber  
+        \node (tuesday_number) at (0,2) [daynumber] {\theNDOYquantieme};
+        \node [base right = 1em of tuesday_number, anchor=base west] [dayname] {Dienstag};
+        \stepNDOY
+
+        %% Wednesday
+        \NDOYtomonthnumber
+        \node (wednesday_number) at (0,3) [daynumber] {\theNDOYquantieme};
+        \node [base right = 1em of wednesday_number, anchor=base west] [dayname] {Mittwoch};
+        \stepNDOY
+
+        %% Thursday
+        \NDOYtomonthnumber
+        \node (thursday_number) at (0,4) [daynumber] {\theNDOYquantieme};
+        \node [base right = 1em of thursday_number, anchor=base west] [dayname] {Donnerstag};
+        \stepNDOY
+
+        %% Friday
+        \NDOYtomonthnumber
+        \node (friday_number) at (0,5) [daynumber] {\theNDOYquantieme};
+        \node [base right = 1em of friday_number, anchor=base west] [dayname] {Freitag};
+        \stepNDOY
+
+        %% Saturday
+        \NDOYtomonthnumber
+        \node (saturday_number) at (0,6) [daynumber] {\theNDOYquantieme};
+        \node [base right = 1em of saturday_number, anchor=base west] [dayname] {Samstag};
+        \stepNDOY
+
+        %% Sunday
+        \NDOYtomonthnumber
+        \node (sunday_number) at (1,6) [daynumber] {\theNDOYquantieme};
+        \node [base right = 1em of sunday_number, anchor=base west] [dayname] {Sonntag};
+        \stepNDOY
+
+        %% Draw lines
+        \foreach \i in {1, 1.2, ..., 7}{%
+            \draw [gray, thin] (2,\i) -- (4,\i);
+        }
+
+        \path (-0.35,0.25) -- (4,0.25);
+        \foreach \i in {1,...,7} {%
+            \draw (-0.35,\i) -- (4,\i);
+        }
+        \draw (2,1) -- (2,7);
+
+        \end{tikzpicture}%
+    }
+
+\begin{document}
+    \foreach \n in {1,...,\value{NumberOfWeeksThisYear}}{%
+        \printweek{\value{NDOYnumber}}
+    }
+\end{document}

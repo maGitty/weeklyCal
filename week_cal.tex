@@ -1,0 +1,141 @@
+\documentclass[%
+  paper=a5,
+  twoside=false,
+  9pt,
+  ]{scrbook}
+\KOMAoptions{pagesize, DIV=30}
+%\usepackage[utf8]{inputenc}
+\usepackage[left=5mm, right=5mm, top=6mm, bottom=2mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage[table]{xcolor}
+\usepackage{tabularx, colortbl}
+\usepackage[german]{babel}
+\usepackage{datetime}
+\usepackage{advdate}
+\usepackage{pgf,pgffor,forloop}% http://ctan.org/pkg/{pgf,pgffor}
+\usepackage[skins]{tcolorbox}
+
+\usepackage{tgbonum}
+
+\tcbset{commonstyle/.style={
+  boxrule=0pt,
+  enhanced,
+  boxsep=0mm,
+  left=1mm,
+  right=0mm,
+  before={\noindent},
+  segmentation style={solid, blue!30}}}
+
+\newtcolorbox{mycolorbox}[1][]{commonstyle,#1}
+
+%\usepackage{showframe}
+
+\selectlanguage{german}
+\pagenumbering{gobble} % to suppress page numbers
+
+\newcommand{\calhead}[2]{\begin{flushright}\textcolor{gray!100}{#1~#2}\end{flushright}\vspace{0.5em}}
+
+\newcommand{\vlspace}{\tcbline\vspace{0.23em}}
+
+\newcommand{\makeday}[1]{\begin{mycolorbox}#1\vlspace\vlspace\vlspace\vlspace\vlspace\end{mycolorbox}}
+
+\newcommand{\makesmalldays}[2]{
+\noindent\hspace{-8pt}
+\begin{tabularx}{1.032\textwidth}{XX}
+  \makeday{#1} & \makeday{#2}
+\end{tabularx}
+}
+
+\newcommand{\makeweek}[7]{\makeday{#1}\makeday{#2}\makeday{#3}\makeday{#4}\makeday{#5}\makesmalldays{#6}{#7}}
+
+%\formatdate{8}{6}{2019}
+
+\begin{document}
+
+\fontfamily{qag}\selectfont
+
+  \SetDate[31/12/2018]
+  %\newdateformat{mydate}{\THEDAY~\THEMONTH}
+  %\mydate\today
+
+\newcounter{dayct}
+
+\calhead{\monthname}{\the\year}
+
+\makeweek{01 Mo}{02 Di}{03 Mi}{04 Do}{05 Fr}{06 Sa}{07 So}
+%\makeday{01 Mo}
+%
+%\makeday{02 Di}
+%
+%\makeday{03 Mi}
+%
+%\makeday{04 Do}
+%
+%\makeday{05 Fr}
+%
+%\makeday{06 Sa}
+%
+%\makeday{07 So}
+
+
+
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+%\begin{minipage}{\mpagelen}
+%  \begin{tabular}{|c}
+%
+%    \dayofweekname{\day}{\month}{\year}
+%  \end{tabular}
+%\end{minipage}
+%\AdvanceDate
+%%%
+\newpage
+
+\end{document}

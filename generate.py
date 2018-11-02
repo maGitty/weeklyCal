@@ -1,4 +1,10 @@
- 
+
+class Generator:
+    def __init__:
+        pass
+    def generate():
+        pass
+
 pre =
 """
 \documentclass[tikz]{standalone}% Does not support leap years.

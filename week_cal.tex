@@ -1,40 +1,225 @@
 \documentclass[%
+  table,
   paper=a5,
   twoside=false,
-  9pt,
-  ]{scrbook}
-\KOMAoptions{pagesize, DIV=30}
+  12pt,
+]{scrartcl}
+
+\KOMAoptions{pagesize, DIV=50}
 %\usepackage[utf8]{inputenc}
-\usepackage[left=5mm, right=5mm, top=6mm, bottom=2mm]{geometry}
+\usepackage[left=5mm, right=5mm, top=4mm, bottom=4mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
-\usepackage[table]{xcolor}
-\usepackage{tabularx, colortbl}
+\usepackage{tabularx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{pgf,pgffor,forloop}
 \usepackage[german]{babel}
 \usepackage{datetime}
+\usepackage{scrdate}
 \usepackage{advdate}
-\usepackage{pgf,pgffor,forloop}% http://ctan.org/pkg/{pgf,pgffor}
-\usepackage[skins]{tcolorbox}
+\usepackage{lscape}
+\usepackage{makecell}
+\usepackage{verbatimbox}
+\usepackage{ifthen}
+\usepackage{intcalc}
+\usepackage{tikz}
+\usepackage{pgfkeys}
+\usepackage{pgfcalendar}
 
-\usepackage{tgbonum}
+\usetikzlibrary{calc}
+\usetikzlibrary{calendar}
+\renewcommand*\familydefault{\sfdefault}
 
-\tcbset{commonstyle/.style={
-  boxrule=0pt,
-  enhanced,
-  boxsep=0mm,
-  left=1mm,
-  right=0mm,
-  before={\noindent},
-  segmentation style={solid, blue!30}}}
+\year=2019
+\newcommand{\prevyear}{\the\numexpr\year - 1\relax}
+\newcommand{\nextyear}{\the\numexpr\year + 1\relax}
+\def\targetdate{}
 
-\newtcolorbox{mycolorbox}[1][]{commonstyle,#1}
-
-%\usepackage{showframe}
+\definecolor{accent_yellow}{HTML}{b58900}
+\definecolor{accent_orange}{HTML}{cb4b16}
+\definecolor{accent_red}{HTML}{dc322f}
+\definecolor{accent_magenta}{HTML}{d33682}
+\definecolor{accent_violet}{HTML}{6c71c4}
+\definecolor{accent_blue}{HTML}{268bd2}
+\definecolor{accent_cyan}{HTML}{2aa198}
+\definecolor{accent_green}{HTML}{859900}
 
 \selectlanguage{german}
 \pagenumbering{gobble} % to suppress page numbers
 
+
+%% year cal
+% Names of Holidays are inserted by employing this macro
+\def\termin#1#2#3{
+  \expandafter\ifx\csname pgf@sh@pi@cal-#1\endcsname\relax
+  \else
+    \if{\land{}{}}
+    \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};\fi%
+  %\@ifundefined{pgf@sh@ns@cal-#1}{}{\node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};}
+%  \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};
+}
+
+\newcount\FirstDayCount
+\newcount\YearCount
+\newcommand\GetMondaysDate[1]
+{%
+  \pgfcalendardatetojulian{#1-01-01}\FirstDayCount
+  \pgfcalendarjuliantoweekday{\FirstDayCount}\FirstDayCount
+  \YearCount=#1
+  \advance\YearCount-1
+  \ifcase\FirstDayCount
+    \def\MondaysDateIs{01/01/#1}%
+  \or % 1
+    \edef\MondaysDateIs{31/12/\the\YearCount}%
+  \or % 2
+    \edef\MondaysDateIs{30/12/\the\YearCount}%
+  \or % 3
+    \edef\MondaysDateIs{29/12/\the\YearCount}%
+  \or % 4
+    \edef\MondaysDateIs{28/12/\the\YearCount}%
+  \or % 5
+    \edef\MondaysDateIs{27/12/\the\YearCount}%
+  \or % 6
+    \edef\MondaysDateIs{26/12/\the\YearCount}%
+  \fi
+}
+
+\newcommand{\firstmonday}{
+  \ifdate{Monday}
+}
+
+\newcommand{\calfromto}[2]{
+  \begin{center}
+    \the\year\\%
+    \vspace{5pt}
+    
+  \begin{tikzpicture}[every day/.style={anchor = north}]
+  \calendar[
+    dates=#1 to #2,
+    name=cal,
+    day yshift = 3em,
+    day code=
+    {
+      \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
+      minimum height= .6cm, text width = 4.4cm, draw = gray]{\tikzdaytext};
+      \draw (-1.8cm, -.1ex) node[anchor = west]{\footnotesize%
+        \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
+    },
+    execute before day scope=
+    {
+      \ifdate{day of month=1}
+      {
+        % Shift right
+        \pgftransformxshift{4.64cm}
+        % Print month name 
+        \draw (0,0)node [shape=rectangle, minimum height= .6cm,
+          text width = 4.4cm, fill = red, text= white, draw = red, text centered]
+          {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
+      }{}
+      \ifdate{workday}
+      {
+        % normal days are white
+        \tikzset{every day/.style={fill=white}}
+        % Vacation gray background
+        \ifdate{between=\the\year-01-01 and \the\year-01-05}{%
+          \tikzset{every day/.style={fill=gray!30}}}{}
+        \ifdate{between=\the\year-12-24 and \the\year-12-31}{%
+          \tikzset{every day/.style={fill=gray!30}}}{}
+        \ifdate{between=\the\year-02-10 and \the\year-04-01}{%
+          \tikzset{every day/.style={fill=gray!30}}}{}
+        \ifdate{between=\the\year-07-27 and \the\year-10-01}{%
+          \tikzset{every day/.style={fill=gray!30}}}{}
+      }{}
+      % Saturdays and half holidays
+      \ifdate{Saturday}{\tikzset{every day/.style={fill=red!10}}}{}
+      \ifdate{equals=12-24}{\tikzset{every day/.style={fill=red!10}}}{}
+      \ifdate{equals=12-31}{\tikzset{every day/.style={fill=red!10}}}{}
+      % Sundays and full holidays
+      \ifdate{Sunday}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=01-01}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=01-06}{\tikzset{every day/.style={fill=red!20}}}{}
+      %\ifdate{equals=05-01}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=10-03}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=11-01}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=12-25}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=12-26}{\tikzset{every day/.style={fill=red!20}}}{}
+      % Christian holidays
+      \ifdate{equals=\the\year-03-29}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=\the\year-04-01}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=\the\year-05-09}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=\the\year-05-20}{\tikzset{every day/.style={fill=red!20}}}{}
+      \ifdate{equals=\the\year-05-30}{\tikzset{every day/.style={fill=red!20}}}{}
+    },
+   execute at begin day scope=
+    {
+      % each day is shifted down according to the day of month
+      \pgftransformyshift{-.6*\pgfcalendarcurrentday cm}
+    }
+  ];
+  
+  \ifthenelse{\equal{#1}{\the\year-01-01}}{
+    \termin{\the\year-01-01}{Neujahr}{#1}
+    \termin{\the\year-01-06}{Heilige Drei Könige\\\vspace{-1em}abc}{#1}
+    \termin{\the\year-02-14}{Valentinstag}{#1}
+  } {
+  \ifthenelse{\equal{#1}{\the\year-04-01}}{
+    \termin{\the\year-04-19}{Karfreitag}{#1}
+    \termin{\the\year-04-21}{Ostersonntag}{#1}
+    \termin{\the\year-04-22}{Ostermontag}{#1}
+    \termin{\the\year-05-12}{Muttertag}{#1}
+    %\termin{\the\year-05-01}{Tag der Arbeit}{#1}
+    \termin{\the\year-05-30}{Christi Himmelfahrt}{#1}
+    \termin{\the\year-06-09}{Pfingstsonntag}{#1}
+    \termin{\the\year-06-10}{Pfingstmontag}{#1}
+    \termin{\the\year-06-20}{Fronleichnam}{#1}
+  } {
+  \ifthenelse{\equal{#1}{\the\year-07-01}}{
+    
+  } {
+  \ifthenelse{\equal{#1}{\the\year-10-01}}{
+    \termin{\the\year-10-03}{Tag der deutschen Einheit}{#1}
+    \termin{\the\year-10-31}{Halloween}{#1}
+    \termin{\the\year-11-01}{Allerheiligen}{#1}
+    \termin{\the\year-12-24}{Heilig Abend}{#1}
+    \termin{\the\year-12-25}{1.\ Weihnachtsfeiertag}{#1}
+    \termin{\the\year-12-26}{2.\ Weihnachtsfeiertag}{#1}
+    \termin{\the\year-12-31}{Silvester}{#1}
+  }}}}
+  
+  \end{tikzpicture}
+  \end{center}
+}
+%% year cal
+
+
+\def\Expr#1{\the\numexpr #1\relax}
+
+\def\Modulonumber#1#2{\Expr{#2-((((#2+(#1/2))/#1)-1)*#1)}}
+\def\Divisionnumber#1#2{\Expr{(2*#2-#1)/(2*#1)}}
+
+\def\Mod#1#2{\Modulonumber{\Expr{#2}}{\Expr{#1}}}
+\def\Div#1#2{\Divisionnumber{\Expr{#2}}{\Expr{#1}}}
+
+\def\Jday#1#2#3%
+    {\Expr{#1+\Div{((153*(\Expr{#2+(12*(\Div{14-#2}{12}))-3}))+2)}
+     {5}+365*(\Expr{#3+4800-(\Div{14-#2}{12})})+
+      (\Div{\Expr{#3+4800-(\Div{14-#2}{12})}}{4})-
+      (\Div{\Expr{#3+4800-(\Div{14-#2}{12})}}{100})+
+      (\Div{\Expr{#3+4800-(\Div{14-#2}{12})}}{400})-32045 }}
+
+\def\cwhlp#1#2#3%
+    {\Expr{\Mod {\Mod {\Mod {\Expr
+     {\Jday{#1}{#2}{#3}+31741-\Mod{\Jday{#1}{#2}{#3}}{7}}}%
+     {146097}}{36524}}{1461}}}
+
+\def\calendarweek#1#2#3%
+  {\Expr{\Expr{\Div{\Expr{\Mod{\cwhlp{#1}{#2}{#3}-
+    \Expr{\Div{\cwhlp{#1}{#2}{#3}}{1460}}}{365}+
+         \Expr{\Div{\cwhlp{#1}{#2}{#3}}{1460}}}}{7} +1}}}
+
 \newcommand{\calhead}[2]{\begin{flushright}\textcolor{gray!100}{#1~#2}\end{flushright}\vspace{0.5em}}
+
+\newcommand{\showdate}{\the\day. \the\month. \DayName{\year}{\month}{\day}}
 
 \newcommand{\vlspace}{\tcbline\vspace{0.23em}}
 
@@ -47,95 +232,174 @@
 \end{tabularx}
 }
 
-\newcommand{\makeweek}[7]{\makeday{#1}\makeday{#2}\makeday{#3}\makeday{#4}\makeday{#5}\makesmalldays{#6}{#7}}
+\newcommand{\weekplan}[1]{
+  \begin{landscape}
+    ~\\
+    \vspace{-10pt}
+    \textbf{#1:}\\
+    
+    \addvbuffer[0pt 0pt]
+    {\rowcolors{2}{white}{white}
+    \begin{tabular*}{\columnwidth}[c]{@{\extracolsep{\stretch{1}}}*{6}{|c}|@{}}
+      \hline
+      Zeit & Montag & Dienstag & Mittwoch & Donnerstag & Freitag\\\hline
+      \thead{8:00\\-\\9:30} & & & & &\\[32pt]\hline
+      \thead{9:45\\-\\11:15} & & & & &\\[32pt]\hline
+      \thead{11:30\\-\\13:00} & & & & &\\[32pt]\hline
+      \thead{14:00\\-\\15:30} & & & & &\\[32pt]\hline
+      \thead{15:45\\-\\17:15} & & & & &\\[32pt]\hline
+      \thead{17:30\\-\\19:00} & & & & &\\[32pt]\hline
+    \end{tabular*}}
+  \end{landscape}
+}
 
-%\formatdate{8}{6}{2019}
+\newcounter{bulletct}
+\newcommand{\notepage}{
+  \newpage
+  \vspace{2px}
+  \hspace{-1em}
+  {\sffamily\Large Notizen:\\}%
+  
+  \vspace{3px}
+  
+  \hspace{-1em}
+  \rowcolors{2}{blue!25}{white}
+  \begin{tabularx}{\textwidth}{X}
+    \forloop{bulletct}{0}{\value{bulletct}<41}{ $\bullet$ \\ }
+    %\foreach \x in {1,2,...,20} { $\bullet$ \\ }
+    %$\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\
+  \end{tabularx}
+}
+
+\newcommand{\notetable}[1]{
+  \vspace{4pt}
+  \noindent {\sffamily\large Notizen:\\}%
+  \vspace{12pt}%
+  
+  \noindent
+  \rowcolors{2}{blue!25}{white}
+  \begin{tabularx}{\textwidth}{X}
+    \forloop{bulletct}{0}{\value{bulletct}<#1}{ \\ }
+  \end{tabularx}
+}
+
+\newcommand{\notes}[3][\empty]{%
+  \newpage
+  \noindent {\sffamily\large Notizen:}\vspace{10pt}\\
+  \foreach \n in {1,...,#2}{%
+    \ifthenelse{\equal{#1}{\empty}}
+      {\rule{#3}{0.5pt}\\}
+      {\rule{#3}{0.5pt}\vspace{#1}\\}
+  }
+}
+
+\makeatletter
+\newcommand{\showbullets}{
+  \vspace{4pt}
+  \rowcolors{2}{blue!25}{white}
+  \begin{tabularx}{0.3\textwidth}{X}
+    \vspace{20mm}
+    \forloop{bulletct}{0}{\value{bulletct}<9}{ \\ }
+  \end{tabularx}
+  \rowcolors{2}{white}{white}
+  \vspace{-3pt}
+}
+
+\newcommand{\hpadd}{0}
+
+\newcommand{\showweek}[2]{
+  \newpage
+  \begingroup
+  \raggedright
+  \sffamily
+  {\textbf{\large{\AdvanceDate[#1]\today~--~\AdvanceDate[6]\today,~KW #2}}}%
+  \vspace{3pt}
+  \begin{tabular}{|*3{p{\dimexpr \linewidth/3-2\tabcolsep\relax}|}}
+    \hline
+    \cellcolor{accent_yellow}
+    \AdvanceDate[#1]\showdate &
+    \cellcolor{accent_orange}
+    \AdvanceDate[#1]\AdvanceDate[1]\showdate &
+    \cellcolor{accent_red}
+    \AdvanceDate[#1]\AdvanceDate[2]\showdate \\\hline
+    \showbullets & \showbullets & \showbullets \\[\hpadd\normalbaselineskip]
+    \hline
+    \cellcolor{accent_magenta}
+    \AdvanceDate[#1]\AdvanceDate[3]\showdate &
+    \cellcolor{accent_violet}
+    \AdvanceDate[#1]\AdvanceDate[4]\showdate &
+    \cellcolor{accent_blue}
+    \AdvanceDate[#1]\AdvanceDate[5]\showdate \\\hline
+    \showbullets & \showbullets & \showbullets \\[\hpadd\normalbaselineskip]
+    \hline
+    \cellcolor{accent_cyan}
+    \AdvanceDate[#1]\AdvanceDate[6]\showdate &
+    \cellcolor{accent_green}
+    Aufgaben: &
+    \cellcolor{accent_green}
+    \\\hline                                             
+    \showbullets & \showbullets & \showbullets \\[\hpadd\normalbaselineskip]
+    \hline
+  \end{tabular}%
+  
+%  \vspace{4pt}%
+%    
+  \notetable{6}
+}
+
+\newcounter{daycounter}
 
 \begin{document}
-
 \fontfamily{qag}\selectfont
+\footnotesize
 
-  \SetDate[31/12/2018]
-  %\newdateformat{mydate}{\THEDAY~\THEMONTH}
-  %\mydate\today
+%\SetDate[01/01/\the\year]
+%\targetdate=2019-12-31
+%\newdateformat{mydate}{\THEDAY~\THEMONTH}
+%\mydate\today\\\newpage
+
+%\GetMondaysDate{\the\year}
+%\MondaysDateIs
+
+\newpage
+
+\begin{center}
+{
+\calfromto{\year-01-01}{\year-03-31}
+
+\pagebreak
+
+\calfromto{\year-04-01}{\year-06-30}
+
+\pagebreak
+
+\calfromto{\year-07-01}{\year-09-30}
+
+\pagebreak
+
+\calfromto{\year-10-01}{\year-12-31}
+
+\pagebreak
+}
+\end{center}
+
+\GetMondaysDate{\the\year}
+\SetDate[\MondaysDateIs]
 
 \newcounter{dayct}
 
-\calhead{\monthname}{\the\year}
+\forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\value{daycounter}}{\calendarweek{\the\day}{\the\month}{\the\year}} }
 
-\makeweek{01 Mo}{02 Di}{03 Mi}{04 Do}{05 Fr}{06 Sa}{07 So}
-%\makeday{01 Mo}
-%
-%\makeday{02 Di}
-%
-%\makeday{03 Mi}
-%
-%\makeday{04 Do}
-%
-%\makeday{05 Fr}
-%
-%\makeday{06 Sa}
-%
-%\makeday{07 So}
+\notes{44}{\textwidth}%
+\notes{44}{\textwidth}%
+\notes{44}{\textwidth}%
+\notes{44}{\textwidth}%
+\notes{44}{\textwidth}%
 
+\scriptsize
 
+\weekplan{WS \prevyear /\the\year}%
+\weekplan{SS \the\year /\nextyear}%
 
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-%\begin{minipage}{\mpagelen}
-%  \begin{tabular}{|c}
-%
-%    \dayofweekname{\day}{\month}{\year}
-%  \end{tabular}
-%\end{minipage}
-%\AdvanceDate
-%%%
-\newpage
 
 \end{document}

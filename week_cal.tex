@@ -28,6 +28,10 @@
 
 \usetikzlibrary{calc}
 \usetikzlibrary{calendar}
+
+\selectlanguage{german}
+\pagenumbering{gobble} % to suppress page numbers
+
 \renewcommand*\familydefault{\sfdefault}
 
 \year=2019
@@ -44,9 +48,6 @@
 \definecolor{accent_cyan}{HTML}{2aa198}
 \definecolor{accent_green}{HTML}{859900}
 
-\selectlanguage{german}
-\pagenumbering{gobble} % to suppress page numbers
-
 
 %% year cal
 % Names of Holidays are inserted by employing this macro
@@ -55,8 +56,6 @@
   \else
     \if{\land{}{}}
     \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};\fi%
-  %\@ifundefined{pgf@sh@ns@cal-#1}{}{\node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};}
-%  \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};
 }
 
 \newcount\FirstDayCount
@@ -68,7 +67,7 @@
   \YearCount=#1
   \advance\YearCount-1
   \ifcase\FirstDayCount
-    \def\MondaysDateIs{01/01/#1}%
+    \def\MondaysDateIs{01/01/#1} % 0
   \or % 1
     \edef\MondaysDateIs{31/12/\the\YearCount}%
   \or % 2
@@ -84,113 +83,108 @@
   \fi
 }
 
-\newcommand{\firstmonday}{
-  \ifdate{Monday}
-}
-
 \newcommand{\calfromto}[2]{
   \begin{center}
     \the\year\\%
     \vspace{5pt}
     
-  \begin{tikzpicture}[every day/.style={anchor = north}]
-  \calendar[
-    dates=#1 to #2,
-    name=cal,
-    day yshift = 3em,
-    day code=
-    {
-      \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
-      minimum height= .6cm, text width = 4.4cm, draw = gray]{\tikzdaytext};
-      \draw (-1.8cm, -.1ex) node[anchor = west]{\footnotesize%
-        \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
-    },
-    execute before day scope=
-    {
-      \ifdate{day of month=1}
+    \begin{tikzpicture}[every day/.style={anchor = north}]
+    \calendar[
+      dates=#1 to #2,
+      name=cal,
+      day yshift = 3em,
+      day code=
       {
-        % Shift right
-        \pgftransformxshift{4.64cm}
-        % Print month name 
-        \draw (0,0)node [shape=rectangle, minimum height= .6cm,
-          text width = 4.4cm, fill = red, text= white, draw = red, text centered]
-          {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
-      }{}
-      \ifdate{workday}
+        \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
+        minimum height= .6cm, text width = 4.4cm, draw = gray]{\tikzdaytext};
+        \draw (-1.8cm, -.1ex) node[anchor = west]{\footnotesize%
+          \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
+      },
+      execute before day scope=
       {
-        % normal days are white
-        \tikzset{every day/.style={fill=white}}
-        % Vacation gray background
-        \ifdate{between=\the\year-01-01 and \the\year-01-05}{%
-          \tikzset{every day/.style={fill=gray!30}}}{}
-        \ifdate{between=\the\year-12-24 and \the\year-12-31}{%
-          \tikzset{every day/.style={fill=gray!30}}}{}
-        \ifdate{between=\the\year-02-10 and \the\year-04-01}{%
-          \tikzset{every day/.style={fill=gray!30}}}{}
-        \ifdate{between=\the\year-07-27 and \the\year-10-01}{%
-          \tikzset{every day/.style={fill=gray!30}}}{}
-      }{}
-      % Saturdays and half holidays
-      \ifdate{Saturday}{\tikzset{every day/.style={fill=red!10}}}{}
-      \ifdate{equals=12-24}{\tikzset{every day/.style={fill=red!10}}}{}
-      \ifdate{equals=12-31}{\tikzset{every day/.style={fill=red!10}}}{}
-      % Sundays and full holidays
-      \ifdate{Sunday}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=01-01}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=01-06}{\tikzset{every day/.style={fill=red!20}}}{}
-      %\ifdate{equals=05-01}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=10-03}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=11-01}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=12-25}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=12-26}{\tikzset{every day/.style={fill=red!20}}}{}
-      % Christian holidays
-      \ifdate{equals=\the\year-03-29}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=\the\year-04-01}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=\the\year-05-09}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=\the\year-05-20}{\tikzset{every day/.style={fill=red!20}}}{}
-      \ifdate{equals=\the\year-05-30}{\tikzset{every day/.style={fill=red!20}}}{}
-    },
-   execute at begin day scope=
-    {
-      % each day is shifted down according to the day of month
-      \pgftransformyshift{-.6*\pgfcalendarcurrentday cm}
-    }
-  ];
+        \ifdate{day of month=1}
+        {
+          % Shift right
+          \pgftransformxshift{4.64cm}
+          % Print month name 
+          \draw (0,0)node [shape=rectangle, minimum height= .6cm,
+            text width = 4.4cm, fill = red, text= white, draw = red, text centered]
+            {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
+        }{}
+        \ifdate{workday}
+        {
+          % normal days are white
+          \tikzset{every day/.style={fill=white}}
+          % Vacation gray background
+          \ifdate{between=\the\year-01-01 and \the\year-01-05}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-12-24 and \the\year-12-31}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-02-10 and \the\year-04-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-07-27 and \the\year-10-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+        }{}
+        % Saturdays and half holidays
+        \ifdate{Saturday}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-24}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-31}{\tikzset{every day/.style={fill=red!10}}}{}
+        % Sundays and full holidays
+        \ifdate{Sunday}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-06}{\tikzset{every day/.style={fill=red!20}}}{}
+        %\ifdate{equals=05-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=10-03}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=11-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-25}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-26}{\tikzset{every day/.style={fill=red!20}}}{}
+        % Christian holidays
+        \ifdate{equals=\the\year-03-29}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-04-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-09}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-20}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-30}{\tikzset{every day/.style={fill=red!20}}}{}
+      },
+      execute at begin day scope=
+      {
+        % each day is shifted down according to the day of month
+        \pgftransformyshift{-.6*\pgfcalendarcurrentday cm}
+      }
+    ];
   
-  \ifthenelse{\equal{#1}{\the\year-01-01}}{
-    \termin{\the\year-01-01}{Neujahr}{#1}
-    \termin{\the\year-01-06}{Heilige Drei Könige\\\vspace{-1em}abc}{#1}
-    \termin{\the\year-02-14}{Valentinstag}{#1}
-  } {
-  \ifthenelse{\equal{#1}{\the\year-04-01}}{
-    \termin{\the\year-04-19}{Karfreitag}{#1}
-    \termin{\the\year-04-21}{Ostersonntag}{#1}
-    \termin{\the\year-04-22}{Ostermontag}{#1}
-    \termin{\the\year-05-12}{Muttertag}{#1}
-    %\termin{\the\year-05-01}{Tag der Arbeit}{#1}
-    \termin{\the\year-05-30}{Christi Himmelfahrt}{#1}
-    \termin{\the\year-06-09}{Pfingstsonntag}{#1}
-    \termin{\the\year-06-10}{Pfingstmontag}{#1}
-    \termin{\the\year-06-20}{Fronleichnam}{#1}
-  } {
-  \ifthenelse{\equal{#1}{\the\year-07-01}}{
-    
-  } {
-  \ifthenelse{\equal{#1}{\the\year-10-01}}{
-    \termin{\the\year-10-03}{Tag der deutschen Einheit}{#1}
-    \termin{\the\year-10-31}{Halloween}{#1}
-    \termin{\the\year-11-01}{Allerheiligen}{#1}
-    \termin{\the\year-12-24}{Heilig Abend}{#1}
-    \termin{\the\year-12-25}{1.\ Weihnachtsfeiertag}{#1}
-    \termin{\the\year-12-26}{2.\ Weihnachtsfeiertag}{#1}
-    \termin{\the\year-12-31}{Silvester}{#1}
-  }}}}
-  
-  \end{tikzpicture}
+    \ifthenelse{\equal{#1}{\the\year-01-01}}{
+      \termin{\the\year-01-01}{Neujahr}{#1}
+      \termin{\the\year-01-06}{Heilige Drei Könige\\\vspace{-1em}abc}{#1}
+      \termin{\the\year-02-14}{Valentinstag}{#1}
+    } {
+    \ifthenelse{\equal{#1}{\the\year-04-01}}{
+      \termin{\the\year-04-19}{Karfreitag}{#1}
+      \termin{\the\year-04-21}{Ostersonntag}{#1}
+      \termin{\the\year-04-22}{Ostermontag}{#1}
+      \termin{\the\year-05-12}{Muttertag}{#1}
+      %\termin{\the\year-05-01}{Tag der Arbeit}{#1}
+      \termin{\the\year-05-30}{Christi Himmelfahrt}{#1}
+      \termin{\the\year-06-09}{Pfingstsonntag}{#1}
+      \termin{\the\year-06-10}{Pfingstmontag}{#1}
+      \termin{\the\year-06-20}{Fronleichnam}{#1}
+    } {
+    \ifthenelse{\equal{#1}{\the\year-07-01}}{} {
+    \ifthenelse{\equal{#1}{\the\year-10-01}}{
+      \termin{\the\year-10-03}{Tag der deutschen Einheit}{#1}
+      \termin{\the\year-10-31}{Halloween}{#1}
+      \termin{\the\year-11-01}{Allerheiligen}{#1}
+      \termin{\the\year-12-24}{Heilig Abend}{#1}
+      \termin{\the\year-12-25}{1.\ Weihnachtsfeiertag}{#1}
+      \termin{\the\year-12-26}{2.\ Weihnachtsfeiertag}{#1}
+      \termin{\the\year-12-31}{Silvester}{#1}
+    }}}}
+    \end{tikzpicture}
   \end{center}
 }
 %% year cal
 
+
+\newcommand{\showdate}{\the\day. \the\month. \DayName{\year}{\month}{\day}}
 
 \def\Expr#1{\the\numexpr #1\relax}
 
@@ -219,20 +213,8 @@
 
 \newcommand{\calhead}[2]{\begin{flushright}\textcolor{gray!100}{#1~#2}\end{flushright}\vspace{0.5em}}
 
-\newcommand{\showdate}{\the\day. \the\month. \DayName{\year}{\month}{\day}}
-
-\newcommand{\vlspace}{\tcbline\vspace{0.23em}}
-
-\newcommand{\makeday}[1]{\begin{mycolorbox}#1\vlspace\vlspace\vlspace\vlspace\vlspace\end{mycolorbox}}
-
-\newcommand{\makesmalldays}[2]{
-\noindent\hspace{-8pt}
-\begin{tabularx}{1.032\textwidth}{XX}
-  \makeday{#1} & \makeday{#2}
-\end{tabularx}
-}
-
 \newcommand{\weekplan}[1]{
+  \newpage
   \begin{landscape}
     ~\\
     \vspace{-10pt}
@@ -253,22 +235,19 @@
   \end{landscape}
 }
 
+\newcommand{\contactblock}{
+  \\
+  Telefon:~\hrulefill\\[3pt]
+  Adresse:~\hrulefill
+  \vspace{6pt}
+}
+
 \newcounter{bulletct}
-\newcommand{\notepage}{
+\newcommand{\contacts}[1]{
   \newpage
-  \vspace{2px}
-  \hspace{-1em}
-  {\sffamily\Large Notizen:\\}%
-  
-  \vspace{3px}
-  
-  \hspace{-1em}
-  \rowcolors{2}{blue!25}{white}
-  \begin{tabularx}{\textwidth}{X}
-    \forloop{bulletct}{0}{\value{bulletct}<41}{ $\bullet$ \\ }
-    %\foreach \x in {1,2,...,20} { $\bullet$ \\ }
-    %$\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\ $\bullet$ \\
-  \end{tabularx}
+  {\large Kontakte:}
+  \vspace{6pt}
+  \forloop{bulletct}{0}{\value{bulletct}<#1}{ \contactblock }
 }
 
 \newcommand{\notetable}[1]{
@@ -285,11 +264,18 @@
 
 \newcommand{\notes}[3][\empty]{%
   \newpage
-  \noindent {\sffamily\large Notizen:}\vspace{10pt}\\
+  \noindent{\large Notizen:}\\[10pt]
   \foreach \n in {1,...,#2}{%
     \ifthenelse{\equal{#1}{\empty}}
-      {\rule{#3}{0.5pt}\\}
-      {\rule{#3}{0.5pt}\vspace{#1}\\}
+      {\hrulefill\\}
+      {\hrulefill\vspace{#1}\\}
+  }
+}
+
+\newcommand{\blanknotes}[1]{
+  \forloop{bulletct}{0}{\value{bulletct}<#1}{
+    \newpage
+    \noindent{\large Notizen:}\\[10pt]
   }
 }
 
@@ -342,8 +328,6 @@
     \hline
   \end{tabular}%
   
-%  \vspace{4pt}%
-%    
   \notetable{6}
 }
 
@@ -390,16 +374,16 @@
 
 \forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\value{daycounter}}{\calendarweek{\the\day}{\the\month}{\the\year}} }
 
-\notes{44}{\textwidth}%
-\notes{44}{\textwidth}%
-\notes{44}{\textwidth}%
-\notes{44}{\textwidth}%
-\notes{44}{\textwidth}%
+\contacts{17}%
+\contacts{17}%
+
+\forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
+
+\blanknotes{5}
 
 \scriptsize
 
 \weekplan{WS \prevyear /\the\year}%
 \weekplan{SS \the\year /\nextyear}%
-
 
 \end{document}

@@ -39,13 +39,13 @@
 \newcommand{\nextyear}{\the\numexpr\year + 1\relax}
 \def\targetdate{}
 
-\definecolor{accent_yellow}{HTML}{b58900}
-\definecolor{accent_orange}{HTML}{cb4b16}
-\definecolor{accent_red}{HTML}{dc322f}
-\definecolor{accent_magenta}{HTML}{d33682}
-\definecolor{accent_violet}{HTML}{6c71c4}
-\definecolor{accent_blue}{HTML}{268bd2}
-\definecolor{accent_cyan}{HTML}{2aa198}
+\definecolor{accent_yellow}{HTML}{B58900}
+\definecolor{accent_orange}{HTML}{CB4B16}
+\definecolor{accent_red}{HTML}{DC322F}
+\definecolor{accent_magenta}{HTML}{D33682}
+\definecolor{accent_violet}{HTML}{6C71C4}
+\definecolor{accent_blue}{HTML}{268BD2}
+\definecolor{accent_cyan}{HTML}{2AA198}
 \definecolor{accent_green}{HTML}{859900}
 
 
@@ -332,7 +332,6 @@
 }
 
 \newcounter{daycounter}
-\newcounter{repeater}
 
 \begin{document}
 \fontfamily{qag}\selectfont
@@ -375,9 +374,10 @@
 
 \forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\value{daycounter}}{\calendarweek{\the\day}{\the\month}{\the\year}} }
 
-\forloop{repeater}{0}{\value{repeater}<3}{ \contacts{17} }
+\contacts{17}%
+\contacts{17}%
 
-\forloop{repeater}{0}{\value{repeater}<5}{ \notes{44}{\textwidth} }
+\forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
 
 \blanknotes{5}
 

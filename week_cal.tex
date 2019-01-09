@@ -332,6 +332,7 @@
 }
 
 \newcounter{daycounter}
+\newcounter{repeater}
 
 \begin{document}
 \fontfamily{qag}\selectfont
@@ -374,10 +375,9 @@
 
 \forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\value{daycounter}}{\calendarweek{\the\day}{\the\month}{\the\year}} }
 
-\contacts{17}%
-\contacts{17}%
+\forloop{repeater}{0}{\value{repeater}<3}{ \contacts{17} }
 
-\forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
+\forloop{repeater}{0}{\value{repeater}<5}{ \notes{44}{\textwidth} }
 
 \blanknotes{5}
 

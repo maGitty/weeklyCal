@@ -1,13 +1,14 @@
 \documentclass[%
   table,
   paper=a5,
-  twoside=false,
+  twoside,
   12pt,
-]{scrartcl}
+]{scrbook}
 
-\KOMAoptions{pagesize, DIV=50}
+\KOMAoptions{pagesize, DIV=60}
 %\usepackage[utf8]{inputenc}
-\usepackage[left=5mm, right=5mm, top=4mm, bottom=4mm]{geometry}
+%\usepackage[left=5mm, right=5mm, top=4mm, bottom=4mm]{geometry}
+\usepackage[inner=10mm, outer=5mm, top=4mm, bottom=4mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{tabularx}
@@ -25,6 +26,8 @@
 \usepackage{tikz}
 \usepackage{pgfkeys}
 \usepackage{pgfcalendar}
+
+%\addtolength\oddsidemargin{4mm}
 
 \usetikzlibrary{calc}
 \usetikzlibrary{calendar}
@@ -96,7 +99,7 @@
       day code=
       {
         \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
-        minimum height= .6cm, text width = 4.4cm, draw = gray]{\tikzdaytext};
+        minimum height= .58cm, text width = 4.1cm, draw = gray]{\tikzdaytext};
         \draw (-1.8cm, -.1ex) node[anchor = west]{\footnotesize%
           \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
       },
@@ -105,10 +108,10 @@
         \ifdate{day of month=1}
         {
           % Shift right
-          \pgftransformxshift{4.64cm}
+          \pgftransformxshift{4.34cm}
           % Print month name 
-          \draw (0,0)node [shape=rectangle, minimum height= .6cm,
-            text width = 4.4cm, fill = red, text= white, draw = red, text centered]
+          \draw (0,0)node [shape=rectangle, minimum height= .58cm,
+            text width = 4.1cm, fill = red, text= white, draw = red, text centered]
             {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
         }{}
         \ifdate{workday}
@@ -148,7 +151,7 @@
       execute at begin day scope=
       {
         % each day is shifted down according to the day of month
-        \pgftransformyshift{-.6*\pgfcalendarcurrentday cm}
+        \pgftransformyshift{-.58*\pgfcalendarcurrentday cm}
       }
     ];
   
@@ -237,9 +240,9 @@
 
 \newcommand{\contactblock}{
   \\
-  Telefon:~\hrulefill\\[3pt]
-  Adresse:~\hrulefill
-  \vspace{6pt}
+  Telefon:~\rule{0.85\textwidth}{0.5pt}\\[3pt]
+  Adresse:~\rule{0.85\textwidth}{0.5pt}
+  \vspace{10pt}
 }
 
 \newcounter{bulletct}
@@ -247,7 +250,7 @@
   \newpage
   {\large Kontakte:}
   \vspace{6pt}
-  \forloop{bulletct}{0}{\value{bulletct}<#1}{ \contactblock }
+  {\scriptsize\forloop{bulletct}{0}{\value{bulletct}<#1}{ \contactblock }}
 }
 
 \newcommand{\notetable}[1]{
@@ -255,9 +258,8 @@
   \noindent {\sffamily\large Notizen:\\}%
   \vspace{12pt}%
   
-  \noindent
   \rowcolors{2}{blue!25}{white}
-  \begin{tabularx}{\textwidth}{X}
+  \hspace{-8pt}\begin{tabularx}{0.93\textwidth}{X}
     \forloop{bulletct}{0}{\value{bulletct}<#1}{ \\ }
   \end{tabularx}
 }
@@ -267,26 +269,25 @@
   \noindent{\large Notizen:}\\[10pt]
   \foreach \n in {1,...,#2}{%
     \ifthenelse{\equal{#1}{\empty}}
-      {\hrulefill\\}
-      {\hrulefill\vspace{#1}\\}
+      {\rule{0.94\textwidth}{0.5pt}\\}
+      {\rule{0.94\textwidth}{0.5pt}\vspace{#1}\\}
   }
 }
 
 \newcommand{\blanknotes}[1]{
   \forloop{bulletct}{0}{\value{bulletct}<#1}{
     \newpage
-    \noindent{\large Notizen:}\\[10pt]
+    \noindent{\large\raggedright Notizen:}\\[10pt]
   }
 }
 
 \makeatletter
 \newcommand{\showbullets}{
-  \vspace{4pt}
+  \vspace{-7mm}
   \rowcolors{2}{blue!25}{white}
-  \begin{tabularx}{0.3\textwidth}{X}
-    \vspace{20mm}
-    \forloop{bulletct}{0}{\value{bulletct}<9}{ \\ }
-  \end{tabularx}
+  \begin{tabular}{p{\dimexpr0.28\textwidth-2\tabcolsep\relax}}
+    \forloop{bulletct}{0}{\value{bulletct}<11}{ \\ }
+  \end{tabular}
   \rowcolors{2}{white}{white}
   \vspace{-3pt}
 }
@@ -295,12 +296,12 @@
 
 \newcommand{\showweek}[2]{
   \newpage
-  \begingroup
-  \raggedright
+  %\begingroup
+  {\raggedright
   \sffamily
   {\textbf{\large{\AdvanceDate[#1]\today~--~\AdvanceDate[6]\today,~KW #2}}}%
   \vspace{3pt}
-  \begin{tabular}{|*3{p{\dimexpr \linewidth/3-2\tabcolsep\relax}|}}
+  \begin{tabular}{|*3{p{\dimexpr0.31\textwidth-2\tabcolsep\relax}|}}
     \hline
     \cellcolor{accent_yellow}
     \AdvanceDate[#1]\showdate &
@@ -329,6 +330,7 @@
   \end{tabular}%
   
   \notetable{6}
+  }
 }
 
 \newcounter{daycounter}
@@ -341,14 +343,11 @@
 %\targetdate=2019-12-31
 %\newdateformat{mydate}{\THEDAY~\THEMONTH}
 %\mydate\today\\\newpage
-
-%\GetMondaysDate{\the\year}
-%\MondaysDateIs
-
+~
 \newpage
 
 \begin{center}
-{
+
 \calfromto{\year-01-01}{\year-03-31}
 
 \pagebreak
@@ -363,27 +362,29 @@
 
 \calfromto{\year-10-01}{\year-12-31}
 
-\pagebreak
-}
-\end{center}
-
 \GetMondaysDate{\the\year}
 \SetDate[\MondaysDateIs]
 
 \newcounter{dayct}
-
+\addtolength\oddsidemargin{5mm}
 \forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\value{daycounter}}{\calendarweek{\the\day}{\the\month}{\the\year}} }
 
+\addtolength\oddsidemargin{-2mm}
+\contacts{17}%
 \contacts{17}%
 \contacts{17}%
 
 \forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
 
+\end{center}
+
 \blanknotes{5}
 
 \scriptsize
 
+\begin{center}
 \weekplan{WS \prevyear /\the\year}%
 \weekplan{SS \the\year /\nextyear}%
+\end{center}
 
 \end{document}

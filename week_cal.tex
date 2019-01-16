@@ -3,7 +3,11 @@
   paper=a5,
   twoside,
   12pt,
+  ngerman
 ]{scrbook}
+
+\usepackage[ngerman]{babel}
+\usepackage[german]{translator}
 
 \KOMAoptions{pagesize, DIV=60}
 %\usepackage[utf8]{inputenc}
@@ -14,7 +18,6 @@
 \usepackage{tabularx}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{pgf,pgffor,forloop}
-\usepackage[german]{babel}
 \usepackage{datetime}
 \usepackage{scrdate}
 \usepackage{advdate}
@@ -27,17 +30,25 @@
 \usepackage{pgfkeys}
 \usepackage{pgfcalendar}
 
-%\addtolength\oddsidemargin{4mm}
+%\def\pgfcalendarmonthname#1{%
+%  \translate{\ifcase#1\or Januar\or Februar\or Maerz\or April\or Mai\or Juni\or Juli\or August\or September\or Oktober\or November\or Dezember\fi}%
+%}
+%
+%\def\pgfcalendarweekdayshortname#1{%
+%  \translate{\ifcase#1\or Mo\or Di\or Mi\or Do\or Fr\or Sa\or So \fi}%
+%}
 
 \usetikzlibrary{calc}
 \usetikzlibrary{calendar}
+\usetikzlibrary{babel}
 
-\selectlanguage{german}
+%\selectlanguage{german}
 \pagenumbering{gobble} % to suppress page numbers
 
 \renewcommand*\familydefault{\sfdefault}
 
 \year=2019
+\def\calyear{\value{\year}}
 \newcommand{\prevyear}{\the\numexpr\year - 1\relax}
 \newcommand{\nextyear}{\the\numexpr\year + 1\relax}
 \def\targetdate{}
@@ -51,7 +62,7 @@
 \definecolor{accent_cyan}{HTML}{2AA198}
 \definecolor{accent_green}{HTML}{859900}
 
-
+\newcommand{\comparedate}{\twodigit\day/\twodigit\month/\the\year}
 %% year cal
 % Names of Holidays are inserted by employing this macro
 \def\termin#1#2#3{
@@ -86,7 +97,80 @@
   \fi
 }
 
+\newcommand{\examcal}[2]{
+  \newpage
+  \begin{center}
+    Klausurphase~#2~\the\year\\%
+    \vspace{5pt}
+    
+    \begin{tikzpicture}[every day/.style={anchor = north}]
+    \calendar[
+      dates=#1-01 to #1-last,
+      name=cal,
+      day yshift = 3em,
+      day code=
+      {
+        \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
+        minimum height= .58cm, text width = 12.3cm, draw = gray]{\tikzdaytext};
+        \draw (-1.8cm, -.1ex) node[right=-4cm]{\footnotesize%
+          \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
+      },
+      execute before day scope=
+      {
+        \ifdate{day of month=1}
+        {
+          % Print month name 
+          \draw (0,0)node [shape=rectangle, minimum height= .58cm,
+            text width = 12.3cm, fill = red, text= white, draw = red, text centered]
+            {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
+        }{}
+        \ifdate{workday}
+        {
+          % normal days are white
+          \tikzset{every day/.style={fill=white}}
+          % Vacation gray background
+          \ifdate{between=\the\year-01-01 and \the\year-01-05}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-12-24 and \the\year-12-31}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-02-10 and \the\year-04-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-07-27 and \the\year-10-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+        }{}
+        % Saturdays and half holidays
+        \ifdate{Saturday}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-24}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-31}{\tikzset{every day/.style={fill=red!10}}}{}
+        % Sundays and full holidays
+        \ifdate{Sunday}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-06}{\tikzset{every day/.style={fill=red!20}}}{}
+        %\ifdate{equals=05-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=10-03}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=11-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-25}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-26}{\tikzset{every day/.style={fill=red!20}}}{}
+        % Christian holidays
+        \ifdate{equals=\the\year-03-29}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-04-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-09}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-20}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-30}{\tikzset{every day/.style={fill=red!20}}}{}
+      },
+      execute at begin day scope=
+      {
+        % each day is shifted down according to the day of month
+        \pgftransformyshift{-.58*\pgfcalendarcurrentday cm}
+      }
+    ];
+    \end{tikzpicture}
+  \end{center}
+}
+%% year cal
+
 \newcommand{\calfromto}[2]{
+  \newpage
   \begin{center}
     \the\year\\%
     \vspace{5pt}
@@ -100,7 +184,7 @@
       {
         \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
         minimum height= .58cm, text width = 4.1cm, draw = gray]{\tikzdaytext};
-        \draw (-1.8cm, -.1ex) node[anchor = west]{\footnotesize%
+        \draw (-1.8cm, -.1ex) node[anchor = west,right=1mm]{\footnotesize%
           \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
       },
       execute before day scope=
@@ -184,10 +268,9 @@
     \end{tikzpicture}
   \end{center}
 }
-%% year cal
 
 
-\newcommand{\showdate}{\the\day. \the\month. \DayName{\year}{\month}{\day}}
+\newcommand{\showdate}{\the\day. \the\month. \shortdayofweekname{\year}{\month}{\day}}
 
 \def\Expr#1{\the\numexpr #1\relax}
 
@@ -251,6 +334,78 @@
   {\scriptsize\forloop{bulletct}{0}{\value{bulletct}<#1}{ \contactblock }}
 }
 
+\newcommand{\birthdaypage}{
+  \edef\numbullets{13}
+  \newpage
+  {\textbf{\large{Geburtstage}}}%
+  \vspace{5pt}
+  \begin{tabular}{|*4{p{\dimexpr0.23\textwidth-2\tabcolsep\relax}|}}
+    \hline
+    \textbf{Januar} &
+    \textbf{Februar} &
+    \textbf{Maerz} &
+    \textbf{April} \\\hline
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} \\[\hpadd\normalbaselineskip]
+    \hline
+    \textbf{Mai} &
+    \textbf{Juni} &
+    \textbf{Juli} &
+    \textbf{August} \\\hline
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} \\[\hpadd\normalbaselineskip]
+    \hline
+    \textbf{September} &
+    \textbf{Oktober} &
+    \textbf{November} &
+    \textbf{Dezember} \\\hline
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} &
+    \showcell{0.20}{\numbullets} \\[\hpadd\normalbaselineskip]
+    \hline
+  \end{tabular}%
+}
+
+\newcommand{\birthdaypagex}{
+  \edef\vlinesep{53mm}
+  \newpage
+  {\textbf{\large{Geburtstage}}}%
+  \vspace{5pt}
+  \begin{tabular}{|*2{p{\dimexpr0.46\textwidth-2\tabcolsep\relax}|}}
+    \hline
+    \textbf{Januar} &
+    \textbf{Februar}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{Maerz} &
+    \textbf{April}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{Mai} &
+    \textbf{Juni}\\\hline
+    & \\[\vlinesep]\hline
+  \end{tabular}%
+  
+  \newpage
+  {\textbf{\large{Geburtstage}}}%
+  \vspace{5pt}
+  \begin{tabular}{|*2{p{\dimexpr0.46\textwidth-2\tabcolsep\relax}|}}
+    \hline
+    \textbf{Juli} &
+    \textbf{August}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{September} &
+    \textbf{Oktober}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{November} &
+    \textbf{Dezember}\\\hline
+    & \\[\vlinesep]\hline
+  \end{tabular}%
+}
+
 \newcommand{\notetable}[1]{
   \vspace{4pt}
   \noindent {\sffamily\large Notizen:\\}%
@@ -279,52 +434,66 @@
   }
 }
 
-\makeatletter
-\newcommand{\showbullets}{
-  \vspace{-7mm}
+\newcommand{\showcell}[2]{
   \rowcolors{2}{blue!25}{white}
-  \begin{tabular}{p{\dimexpr0.28\textwidth-2\tabcolsep\relax}}
-    \forloop{bulletct}{0}{\value{bulletct}<11}{ \\ }
+  \begin{tabular}{p{\dimexpr#1\textwidth-2\tabcolsep\relax}}
+    \comparedate
+    \forloop{bulletct}{0}{\value{bulletct}<#2}{ \\ }
   \end{tabular}
   \rowcolors{2}{white}{white}
   \vspace{-3pt}
 }
 
+%\newcommand{\showcell}[2]{
+%  \thead{\comparedate\\
+%  \showbullets{#1}{#2}}
+%}
+
 \newcommand{\hpadd}{0}
 
-\newcommand{\showweek}[2]{
+\newcommand{\showweek}[1]{
   \newpage
+  \edef\xwidth{0.28}
+  \edef\cellrows{9}
   %\begingroup
   {\raggedright
   \sffamily
-  {\textbf{\large{\AdvanceDate[#1]\today~--~\AdvanceDate[6]\today,~KW #2}}}%
+  {\textbf{\large{\AdvanceDate[#1]\today~--~\AdvanceDate[6]\today,~KW #1}}}%
   \vspace{3pt}
   \begin{tabular}{|*3{p{\dimexpr0.31\textwidth-2\tabcolsep\relax}|}}
     \hline
     \cellcolor{accent_yellow}
-    \AdvanceDate[#1]\showdate &
+    \showdate &
     \cellcolor{accent_orange}
-    \AdvanceDate[#1]\AdvanceDate[1]\showdate &
+    \AdvanceDate[1]\showdate &
     \cellcolor{accent_red}
-    \AdvanceDate[#1]\AdvanceDate[2]\showdate \\\hline
-    \showbullets & \showbullets & \showbullets \\[\hpadd\normalbaselineskip]
-    \hline
+    \AdvanceDate[2]\showdate
+    \\\hline
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows}
+    \\[\hpadd\normalbaselineskip]\hline
     \cellcolor{accent_magenta}
-    \AdvanceDate[#1]\AdvanceDate[3]\showdate &
+    \AdvanceDate[3]\showdate &
     \cellcolor{accent_violet}
-    \AdvanceDate[#1]\AdvanceDate[4]\showdate &
+    \AdvanceDate[4]\showdate &
     \cellcolor{accent_blue}
-    \AdvanceDate[#1]\AdvanceDate[5]\showdate \\\hline
-    \showbullets & \showbullets & \showbullets \\[\hpadd\normalbaselineskip]
-    \hline
+    \AdvanceDate[5]\showdate
+    \\\hline
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows}
+    \\[\hpadd\normalbaselineskip]\hline
     \cellcolor{accent_cyan}
-    \AdvanceDate[#1]\AdvanceDate[6]\showdate &
+    \AdvanceDate[6]\showdate &
     \cellcolor{accent_green}
     Aufgaben: &
     \cellcolor{accent_green}
     \\\hline                                             
-    \showbullets & \showbullets & \showbullets \\[\hpadd\normalbaselineskip]
-    \hline
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows}
+    \\[\hpadd\normalbaselineskip]\hline
   \end{tabular}%
   
   \notetable{6}
@@ -337,46 +506,47 @@
 \fontfamily{qag}\selectfont
 \footnotesize
 
-%\SetDate[01/01/\the\year]
-%\targetdate=2019-12-31
-%\newdateformat{mydate}{\THEDAY~\THEMONTH}
-%\mydate\today\\\newpage
-%~
-%\newpage
-
 \begin{center}
 
-\calfromto{\year-01-01}{\year-03-31}
+\calfromto{\year-01-01}{\year-03-31}%
 
-\pagebreak
+\calfromto{\year-04-01}{\year-06-30}%
 
-\calfromto{\year-04-01}{\year-06-30}
+\calfromto{\year-07-01}{\year-09-30}%
 
-\pagebreak
-
-\calfromto{\year-07-01}{\year-09-30}
-
-\pagebreak
-
-\calfromto{\year-10-01}{\year-12-31}
+\calfromto{\year-10-01}{\year-12-31}%
 
 \GetMondaysDate{\the\year}
 \SetDate[\MondaysDateIs]
 
 \newcounter{dayct}
 \addtolength\oddsidemargin{5mm}
-\forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\value{daycounter}}{\calendarweek{\the\day}{\the\month}{\the\year}} }
+\forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\calendarweek{\the\day}{\the\month}{\the\year}}\AdvanceDate[7] }
+\AdvanceDate[-7]
+
+\examcal{\year-01}{WS}%
+\examcal{\year-02}{WS}%
+\examcal{\year-03}{WS}%
+\examcal{\year-04}{WS}%
+
+\examcal{\year-07}{SS}%
+\examcal{\year-08}{SS}%
+\examcal{\year-09}{SS}%
+\examcal{\year-10}{SS}%
+
+\birthdaypagex%
+%\birthdaypage%
 
 \addtolength\oddsidemargin{-2mm}
 \contacts{17}%
 \contacts{17}%
-\contacts{17}%
+%\contacts{17}%
 
-\forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
+\forloop{bulletct}{0}{\value{bulletct}<4}{ \notes{44}{\textwidth} }
 
 \end{center}
 
-\blanknotes{5}
+\blanknotes{4}
 
 \scriptsize
 

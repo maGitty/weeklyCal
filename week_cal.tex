@@ -14,7 +14,7 @@
 %\usepackage[left=5mm, right=5mm, top=4mm, bottom=4mm]{geometry}
 \usepackage[inner=10mm, outer=5mm, top=4mm, bottom=4mm]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{tabularx}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{pgf,pgffor,forloop}
@@ -29,6 +29,16 @@
 \usepackage{tikz}
 \usepackage{pgfkeys}
 \usepackage{pgfcalendar}
+\usepackage{xstring}
+
+\def\adddate#1#2{\expandafter\gdef\csname my@data@#1\endcsname{#2}}
+\def\usedate#1{%
+  \ifcsname my@data@#1\endcsname
+    \csname my@data@#1\expandafter\endcsname
+  \else
+    \expandafter
+  \fi
+}
 
 %\def\pgfcalendarmonthname#1{%
 %  \translate{\ifcase#1\or Januar\or Februar\or Maerz\or April\or Mai\or Juni\or Juli\or August\or September\or Oktober\or November\or Dezember\fi}%
@@ -63,12 +73,21 @@
 \definecolor{accent_green}{HTML}{859900}
 
 \newcommand{\comparedate}{\twodigit\day/\twodigit\month/\the\year}
+\newcommand{\showdate}{
+\the\day.\the\month.\StrLeft{\DayName{\the\year}{\the\month}{\the\day}}{2}~\StrLeft{\usedate{\comparedate}}{16}
+}
 %% year cal
 % Names of Holidays are inserted by employing this macro
 \def\termin#1#2#3{
+%  \expandafter
+%  \csname
+%  \ifcsname pgf@sh@pi@cal-#1\endcsname\relax
+%    \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};
+%    \expandafter\UndefinedName
+%  \fi
+%  \endcsname
   \expandafter\ifx\csname pgf@sh@pi@cal-#1\endcsname\relax
   \else
-    \if{\land{}{}}
     \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};\fi%
 }
 
@@ -170,7 +189,6 @@
 %% year cal
 
 \newcommand{\calfromto}[2]{
-  \newpage
   \begin{center}
     \the\year\\%
     \vspace{5pt}
@@ -239,38 +257,38 @@
       }
     ];
   
-    \ifthenelse{\equal{#1}{\the\year-01-01}}{
-      \termin{\the\year-01-01}{Neujahr}{#1}
-      \termin{\the\year-01-06}{Heilige Drei Könige\\\vspace{-1em}abc}{#1}
-      \termin{\the\year-02-14}{Valentinstag}{#1}
-    } {
-    \ifthenelse{\equal{#1}{\the\year-04-01}}{
-      \termin{\the\year-04-19}{Karfreitag}{#1}
-      \termin{\the\year-04-21}{Ostersonntag}{#1}
-      \termin{\the\year-04-22}{Ostermontag}{#1}
-      \termin{\the\year-05-12}{Muttertag}{#1}
-      %\termin{\the\year-05-01}{Tag der Arbeit}{#1}
-      \termin{\the\year-05-30}{Christi Himmelfahrt}{#1}
-      \termin{\the\year-06-09}{Pfingstsonntag}{#1}
-      \termin{\the\year-06-10}{Pfingstmontag}{#1}
-      \termin{\the\year-06-20}{Fronleichnam}{#1}
-    } {
-    \ifthenelse{\equal{#1}{\the\year-07-01}}{} {
-    \ifthenelse{\equal{#1}{\the\year-10-01}}{
-      \termin{\the\year-10-03}{Tag der deutschen Einheit}{#1}
-      \termin{\the\year-10-31}{Halloween}{#1}
-      \termin{\the\year-11-01}{Allerheiligen}{#1}
-      \termin{\the\year-12-24}{Heilig Abend}{#1}
-      \termin{\the\year-12-25}{1.\ Weihnachtsfeiertag}{#1}
-      \termin{\the\year-12-26}{2.\ Weihnachtsfeiertag}{#1}
-      \termin{\the\year-12-31}{Silvester}{#1}
-    }}}}
+%    \ifthenelse{\equal{#1}{\the\year-01-01}}{
+%      \termin{\the\year-01-01}{Neujahr}{#1}
+%      \termin{\the\year-01-06}{Heilige Drei Könige\\\vspace{-1em}abc}{#1}
+%      \termin{\the\year-02-14}{Valentinstag}{#1}
+%    } {
+%    \ifthenelse{\equal{#1}{\the\year-04-01}}{
+%      \termin{\the\year-04-19}{Karfreitag}{#1}
+%      \termin{\the\year-04-21}{Ostersonntag}{#1}
+%      \termin{\the\year-04-22}{Ostermontag}{#1}
+%      \termin{\the\year-05-12}{Muttertag}{#1}
+%      %\termin{\the\year-05-01}{Tag der Arbeit}{#1}
+%      \termin{\the\year-05-30}{Christi Himmelfahrt}{#1}
+%      \termin{\the\year-06-09}{Pfingstsonntag}{#1}
+%      \termin{\the\year-06-10}{Pfingstmontag}{#1}
+%      \termin{\the\year-06-20}{Fronleichnam}{#1}
+%    } {
+%    \ifthenelse{\equal{#1}{\the\year-07-01}}{} {
+%    \ifthenelse{\equal{#1}{\the\year-10-01}}{
+%      \termin{\the\year-10-03}{Tag der deutschen Einheit}{#1}
+%      \termin{\the\year-10-31}{Halloween}{#1}
+%      \termin{\the\year-11-01}{Allerheiligen}{#1}
+%      \termin{\the\year-12-24}{Heilig Abend}{#1}
+%      \termin{\the\year-12-25}{1.\ Weihnachtsfeiertag}{#1}
+%      \termin{\the\year-12-26}{2.\ Weihnachtsfeiertag}{#1}
+%      \termin{\the\year-12-31}{Silvester}{#1}
+%    }}}}
     \end{tikzpicture}
   \end{center}
+  \newpage
 }
 
 
-\newcommand{\showdate}{\the\day. \the\month. \shortdayofweekname{\year}{\month}{\day}}
 
 \def\Expr#1{\the\numexpr #1\relax}
 
@@ -435,9 +453,9 @@
 }
 
 \newcommand{\showcell}[2]{
-  \rowcolors{2}{blue!25}{white}
+  \rowcolors{2}{white}{blue!25}
   \begin{tabular}{p{\dimexpr#1\textwidth-2\tabcolsep\relax}}
-    \comparedate
+    %\comparedate
     \forloop{bulletct}{0}{\value{bulletct}<#2}{ \\ }
   \end{tabular}
   \rowcolors{2}{white}{white}
@@ -454,11 +472,11 @@
 \newcommand{\showweek}[1]{
   \newpage
   \edef\xwidth{0.28}
-  \edef\cellrows{9}
+  \edef\cellrows{10}
   %\begingroup
   {\raggedright
   \sffamily
-  {\textbf{\large{\AdvanceDate[#1]\today~--~\AdvanceDate[6]\today,~KW #1}}}%
+  {\textbf{\large{\today~--~\AdvanceDate[6]\today,~KW #1}}}%
   \vspace{3pt}
   \begin{tabular}{|*3{p{\dimexpr0.31\textwidth-2\tabcolsep\relax}|}}
     \hline
@@ -502,11 +520,31 @@
 
 \newcounter{daycounter}
 
+\newcommand{\specdates}[1]{
+  
+}
+
 \begin{document}
 \fontfamily{qag}\selectfont
 \footnotesize
 
+\adddate{31/12/\prevyear}{Silvester}
+\adddate{31/12/\the\year}{Silvester}
+\adddate{01/01/\the\year}{Neujahr}
+\adddate{01/01/\nextyear}{Neujahr}
+\adddate{14/02/\the\year}{Valentinstag}
+\adddate{06/12/\the\year}{Hl. drei Könige}
+\adddate{24/12/\the\year}{Weihnachten}
+
+%\IfStrEq{\comparedate}{16/01/2019}
+%{\comparedate yes!}
+%{\comparedate~16/01/2019 no}
+
+%\usedate{31/12/\the\year}
+
 \begin{center}
+
+%\comparedate
 
 \calfromto{\year-01-01}{\year-03-31}%
 

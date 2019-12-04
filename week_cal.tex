@@ -30,6 +30,22 @@
 \usepackage{pgfkeys}
 \usepackage{pgfcalendar}
 \usepackage{xstring}
+\usepackage{pdfpages}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{calendar}
+\usetikzlibrary{babel}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% specify these two dates %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\year=2020
+\def\firstMonday{30/09/2019}
+
+
+\pagenumbering{gobble} % to suppress page numbers
+\renewcommand*\familydefault{\sfdefault}
 
 \def\adddate#1#2{\expandafter\gdef\csname my@data@#1\endcsname{#2}}
 \def\usedate#1{%
@@ -40,24 +56,6 @@
   \fi
 }
 
-%\def\pgfcalendarmonthname#1{%
-%  \translate{\ifcase#1\or Januar\or Februar\or Maerz\or April\or Mai\or Juni\or Juli\or August\or September\or Oktober\or November\or Dezember\fi}%
-%}
-%
-%\def\pgfcalendarweekdayshortname#1{%
-%  \translate{\ifcase#1\or Mo\or Di\or Mi\or Do\or Fr\or Sa\or So \fi}%
-%}
-
-\usetikzlibrary{calc}
-\usetikzlibrary{calendar}
-\usetikzlibrary{babel}
-
-%\selectlanguage{german}
-\pagenumbering{gobble} % to suppress page numbers
-
-\renewcommand*\familydefault{\sfdefault}
-
-\year=2019
 \def\calyear{\value{\year}}
 \newcommand{\prevyear}{\the\numexpr\year - 1\relax}
 \newcommand{\nextyear}{\the\numexpr\year + 1\relax}
@@ -91,35 +89,11 @@
     \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};\fi%
 }
 
-\newcount\FirstDayCount
-\newcount\YearCount
-\newcommand\GetMondaysDate[1]
-{%
-  \pgfcalendardatetojulian{#1-01-01}\FirstDayCount
-  \pgfcalendarjuliantoweekday{\FirstDayCount}\FirstDayCount
-  \YearCount=#1
-  \advance\YearCount-1
-  \ifcase\FirstDayCount
-    \def\MondaysDateIs{01/01/#1} % 0
-  \or % 1
-    \edef\MondaysDateIs{31/12/\the\YearCount}%
-  \or % 2
-    \edef\MondaysDateIs{30/12/\the\YearCount}%
-  \or % 3
-    \edef\MondaysDateIs{29/12/\the\YearCount}%
-  \or % 4
-    \edef\MondaysDateIs{28/12/\the\YearCount}%
-  \or % 5
-    \edef\MondaysDateIs{27/12/\the\YearCount}%
-  \or % 6
-    \edef\MondaysDateIs{26/12/\the\YearCount}%
-  \fi
-}
 
-\newcommand{\examcal}[2]{
+\newcommand{\examcal}[3]{
   \newpage
   \begin{center}
-    Klausurphase~#2~\the\year\\%
+    Klausurphase~#2~#3\\%
     \vspace{5pt}
     
     \begin{tikzpicture}[every day/.style={anchor = north}]
@@ -188,9 +162,11 @@
 }
 %% year cal
 
-\newcommand{\calfromto}[2]{
+\newcommand{\calfromto}[3]{
+%  \StrLeft{#1}{4}[\thisyear]
   \begin{center}
-    \the\year\\%
+%  	\StrMid{#1}{1}{4}%
+    \textbf{#3}\\%
     \vspace{5pt}
     
     \begin{tikzpicture}[every day/.style={anchor = north}]
@@ -352,44 +328,8 @@
   {\scriptsize\forloop{bulletct}{0}{\value{bulletct}<#1}{ \contactblock }}
 }
 
-\newcommand{\birthdaypage}{
-  \edef\numbullets{13}
-  \newpage
-  {\textbf{\large{Geburtstage}}}%
-  \vspace{5pt}
-  \begin{tabular}{|*4{p{\dimexpr0.23\textwidth-2\tabcolsep\relax}|}}
-    \hline
-    \textbf{Januar} &
-    \textbf{Februar} &
-    \textbf{Maerz} &
-    \textbf{April} \\\hline
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} \\[\hpadd\normalbaselineskip]
-    \hline
-    \textbf{Mai} &
-    \textbf{Juni} &
-    \textbf{Juli} &
-    \textbf{August} \\\hline
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} \\[\hpadd\normalbaselineskip]
-    \hline
-    \textbf{September} &
-    \textbf{Oktober} &
-    \textbf{November} &
-    \textbf{Dezember} \\\hline
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} &
-    \showcell{0.20}{\numbullets} \\[\hpadd\normalbaselineskip]
-    \hline
-  \end{tabular}%
-}
 
-\newcommand{\birthdaypagex}{
+\newcommand{\birthdaypage}{
   \edef\vlinesep{53mm}
   \newpage
   {\textbf{\large{Geburtstage}}}%
@@ -462,11 +402,6 @@
   \vspace{-3pt}
 }
 
-%\newcommand{\showcell}[2]{
-%  \thead{\comparedate\\
-%  \showbullets{#1}{#2}}
-%}
-
 \newcommand{\hpadd}{0}
 
 \newcommand{\showweek}[1]{
@@ -481,31 +416,31 @@
   \begin{tabular}{|*3{p{\dimexpr0.31\textwidth-2\tabcolsep\relax}|}}
     \hline
     \cellcolor{accent_yellow}
-    \showdate &
+    \textcolor{white}{\showdate} &
     \cellcolor{accent_orange}
-    \AdvanceDate[1]\showdate &
+    \AdvanceDate[1]\textcolor{white}{\showdate} &
     \cellcolor{accent_red}
-    \AdvanceDate[2]\showdate
+    \AdvanceDate[2]\textcolor{white}{\showdate}
     \\\hline
     \showcell{\xwidth}{\cellrows} &
     \showcell{\xwidth}{\cellrows} &
     \showcell{\xwidth}{\cellrows}
     \\[\hpadd\normalbaselineskip]\hline
     \cellcolor{accent_magenta}
-    \AdvanceDate[3]\showdate &
+    \AdvanceDate[3]\textcolor{white}{\showdate} &
     \cellcolor{accent_violet}
-    \AdvanceDate[4]\showdate &
+    \AdvanceDate[4]\textcolor{white}{\showdate} &
     \cellcolor{accent_blue}
-    \AdvanceDate[5]\showdate
+    \AdvanceDate[5]\textcolor{white}{\showdate}
     \\\hline
     \showcell{\xwidth}{\cellrows} &
     \showcell{\xwidth}{\cellrows} &
     \showcell{\xwidth}{\cellrows}
     \\[\hpadd\normalbaselineskip]\hline
     \cellcolor{accent_cyan}
-    \AdvanceDate[6]\showdate &
+    \AdvanceDate[6]\textcolor{white}{\showdate} &
     \cellcolor{accent_green}
-    Aufgaben: &
+    \textcolor{white}{Aufgaben:} &
     \cellcolor{accent_green}
     \\\hline                                             
     \showcell{\xwidth}{\cellrows} &
@@ -520,18 +455,15 @@
 
 \newcounter{daycounter}
 
-\newcommand{\specdates}[1]{
-  
-}
 
 \begin{document}
 \fontfamily{qag}\selectfont
 \footnotesize
 
-\adddate{31/12/\prevyear}{Silvester}
+%\adddate{31/12/\prevyear}{Silvester}
 \adddate{31/12/\the\year}{Silvester}
 \adddate{01/01/\the\year}{Neujahr}
-\adddate{01/01/\nextyear}{Neujahr}
+%\adddate{01/01/\nextyear}{Neujahr}
 \adddate{14/02/\the\year}{Valentinstag}
 \adddate{06/12/\the\year}{Hl. drei Könige}
 \adddate{24/12/\the\year}{Weihnachten}
@@ -542,49 +474,59 @@
 
 %\usedate{31/12/\the\year}
 
+\includepdf[scale=.94,pagecommand={
+  \vspace*{25mm}
+  \begin{center}
+    \textcolor{white}{\Huge\textbf{weekly \prevyear/\the\year}}
+  \end{center}
+  }]{bulb8}
+
+\newpage
+\clearpage~
+\newpage
+
 \begin{center}
 
-%\comparedate
+\calfromto{\prevyear-10-01}{\prevyear-12-31}{\prevyear}%
 
-\calfromto{\year-01-01}{\year-03-31}%
+\calfromto{\the\year-01-01}{\the\year-03-31}{\the\year}%
 
-\calfromto{\year-04-01}{\year-06-30}%
+\calfromto{\the\year-04-01}{\the\year-06-30}{\the\year}%
 
-\calfromto{\year-07-01}{\year-09-30}%
+\calfromto{\the\year-07-01}{\the\year-09-30}{\the\year}%
 
-\calfromto{\year-10-01}{\year-12-31}%
-
-\GetMondaysDate{\the\year}
-\SetDate[\MondaysDateIs]
+\SetDate[\firstMonday]
 
 \newcounter{dayct}
 \addtolength\oddsidemargin{5mm}
-\forloop[7]{daycounter}{0}{\value{daycounter}<365}{ \showweek{\calendarweek{\the\day}{\the\month}{\the\year}}\AdvanceDate[7] }
+\forloop[7]{daycounter}{0}{\value{daycounter}<365}
+  {
+  \showweek{\calendarweek{\the\day}{\the\month}{\the\year}}\AdvanceDate[7]
+  }
 \AdvanceDate[-7]
 
-\examcal{\year-01}{WS}%
-\examcal{\year-02}{WS}%
-\examcal{\year-03}{WS}%
-\examcal{\year-04}{WS}%
+\addtolength\oddsidemargin{-4mm}
 
-\examcal{\year-07}{SS}%
-\examcal{\year-08}{SS}%
-\examcal{\year-09}{SS}%
-\examcal{\year-10}{SS}%
+\examcal{\the\year-01}{WS}{\prevyear/\the\year}%
+\examcal{\the\year-02}{WS}{\prevyear/\the\year}%
+\examcal{\the\year-03}{WS}{\prevyear/\the\year}%
+\examcal{\the\year-04}{WS}{\prevyear/\the\year}%
 
-\birthdaypagex%
-%\birthdaypage%
+\examcal{\the\year-07}{SS}{\the\year}%
+\examcal{\the\year-08}{SS}{\the\year}%
+\examcal{\the\year-09}{SS}{\the\year}%
+\examcal{\the\year-10}{SS}{\the\year}%
 
-\addtolength\oddsidemargin{-2mm}
+\birthdaypage%
+
 \contacts{17}%
 \contacts{17}%
-%\contacts{17}%
 
-\forloop{bulletct}{0}{\value{bulletct}<4}{ \notes{44}{\textwidth} }
+\forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
 
 \end{center}
 
-\blanknotes{4}
+\blanknotes{5}
 
 \scriptsize
 

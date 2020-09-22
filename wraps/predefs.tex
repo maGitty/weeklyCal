@@ -1,0 +1,411 @@
+
+\pagenumbering{gobble} % to suppress page numbers
+\renewcommand*\familydefault{\sfdefault}
+
+\def\adddate#1#2{\expandafter\gdef\csname my@data@#1\endcsname{#2}}
+\def\usedate#1{%
+  \ifcsname my@data@#1\endcsname
+    \csname my@data@#1\expandafter\endcsname
+  \else
+    \expandafter
+  \fi
+}
+
+\def\calyear{\value{\year}}
+\newcommand{\prevyear}{\the\numexpr\year - 1\relax}
+\newcommand{\nextyear}{\the\numexpr\year + 1\relax}
+\def\targetdate{}
+
+\definecolor{accent_yellow}{HTML}{B58900}
+\definecolor{accent_orange}{HTML}{CB4B16}
+\definecolor{accent_red}{HTML}{DC322F}
+\definecolor{accent_magenta}{HTML}{D33682}
+\definecolor{accent_violet}{HTML}{6C71C4}
+\definecolor{accent_blue}{HTML}{268BD2}
+\definecolor{accent_cyan}{HTML}{2AA198}
+\definecolor{accent_green}{HTML}{859900}
+
+\newcommand{\comparedate}{\twodigit\day/\twodigit\month/\the\year}
+\newcommand{\showdate}{
+\the\day.\the\month.\StrLeft{\DayName{\the\year}{\the\month}{\the\day}}{2}~\StrLeft{\usedate{\comparedate}}{16}
+}
+%% year cal
+% Names of Holidays are inserted by employing this macro
+\def\termin#1#2#3{
+%  \expandafter
+%  \csname
+%  \ifcsname pgf@sh@pi@cal-#1\endcsname\relax
+%    \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};
+%    \expandafter\UndefinedName
+%  \fi
+%  \endcsname
+  \expandafter\ifx\csname pgf@sh@pi@cal-#1\endcsname\relax
+  \else
+    \node [anchor=north west, text width= 3.4cm] at ($(cal-#1.north west)+(3em, 0em)$) {\tiny{#2}};\fi%
+}
+
+
+\newcommand{\examcal}[3]{
+  \newpage
+  \begin{center}
+    Klausurphase~#2~#3\\%
+    \vspace{5pt}
+    
+    \begin{tikzpicture}[every day/.style={anchor = north}]
+    \calendar[
+      dates=#1-01 to #1-last,
+      name=cal,
+      day yshift = 3em,
+      day code=
+      {
+        \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
+        minimum height= .58cm, text width = 12.3cm, draw = gray]{\tikzdaytext};
+        \draw (-1.8cm, -.1ex) node[right=-4cm]{\footnotesize%
+          \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
+      },
+      execute before day scope=
+      {
+        \ifdate{day of month=1}
+        {
+          % Print month name 
+          \draw (0,0)node [shape=rectangle, minimum height= .58cm,
+            text width = 12.3cm, fill = red, text= white, draw = red, text centered]
+            {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
+        }{}
+        \ifdate{workday}
+        {
+          % normal days are white
+          \tikzset{every day/.style={fill=white}}
+          % Vacation gray background
+          \ifdate{between=\the\year-01-01 and \the\year-01-05}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-12-24 and \the\year-12-31}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-02-10 and \the\year-04-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-07-27 and \the\year-10-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+        }{}
+        % Saturdays and half holidays
+        \ifdate{Saturday}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-24}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-31}{\tikzset{every day/.style={fill=red!10}}}{}
+        % Sundays and full holidays
+        \ifdate{Sunday}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-06}{\tikzset{every day/.style={fill=red!20}}}{}
+        %\ifdate{equals=05-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=10-03}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=11-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-25}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-26}{\tikzset{every day/.style={fill=red!20}}}{}
+        % Christian holidays
+        \ifdate{equals=\the\year-03-29}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-04-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-09}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-20}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-30}{\tikzset{every day/.style={fill=red!20}}}{}
+      },
+      execute at begin day scope=
+      {
+        % each day is shifted down according to the day of month
+        \pgftransformyshift{-.58*\pgfcalendarcurrentday cm}
+      }
+    ];
+    \end{tikzpicture}
+  \end{center}
+}
+%% year cal
+
+\newcommand{\calfromto}[3]{
+%  \StrLeft{#1}{4}[\thisyear]
+  \begin{center}
+%  	\StrMid{#1}{1}{4}%
+    \textbf{#3}\\%
+    \vspace{5pt}
+    
+    \begin{tikzpicture}[every day/.style={anchor = north}]
+    \calendar[
+      dates=#1 to #2,
+      name=cal,
+      day yshift = 3em,
+      day code=
+      {
+        \node[name=\pgfcalendarsuggestedname,every day,shape=rectangle,
+        minimum height= .58cm, text width = 4.1cm, draw = gray]{\tikzdaytext};
+        \draw (-1.8cm, -.1ex) node[anchor = west,right=1mm]{\footnotesize%
+          \pgfcalendarweekdayshortname{\pgfcalendarcurrentweekday}};
+      },
+      execute before day scope=
+      {
+        \ifdate{day of month=1}
+        {
+          % Shift right
+          \pgftransformxshift{4.34cm}
+          % Print month name 
+          \draw (0,0)node [shape=rectangle, minimum height= .58cm,
+            text width = 4.1cm, fill = red, text= white, draw = red, text centered]
+            {\textbf{\pgfcalendarmonthname{\pgfcalendarcurrentmonth}}};
+        }{}
+        \ifdate{workday}
+        {
+          % normal days are white
+          \tikzset{every day/.style={fill=white}}
+          % Vacation gray background
+          \ifdate{between=\the\year-01-01 and \the\year-01-05}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-12-24 and \the\year-12-31}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-02-10 and \the\year-04-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+          \ifdate{between=\the\year-07-27 and \the\year-10-01}{%
+            \tikzset{every day/.style={fill=gray!30}}}{}
+        }{}
+        % Saturdays and half holidays
+        \ifdate{Saturday}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-24}{\tikzset{every day/.style={fill=red!10}}}{}
+        \ifdate{equals=12-31}{\tikzset{every day/.style={fill=red!10}}}{}
+        % Sundays and full holidays
+        \ifdate{Sunday}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=01-06}{\tikzset{every day/.style={fill=red!20}}}{}
+        %\ifdate{equals=05-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=10-03}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=11-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-25}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=12-26}{\tikzset{every day/.style={fill=red!20}}}{}
+        % Christian holidays
+        \ifdate{equals=\the\year-03-29}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-04-01}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-09}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-20}{\tikzset{every day/.style={fill=red!20}}}{}
+        \ifdate{equals=\the\year-05-30}{\tikzset{every day/.style={fill=red!20}}}{}
+      },
+      execute at begin day scope=
+      {
+        % each day is shifted down according to the day of month
+        \pgftransformyshift{-.58*\pgfcalendarcurrentday cm}
+      }
+    ];
+  
+%    \ifthenelse{\equal{#1}{\the\year-01-01}}{
+%      \termin{\the\year-01-01}{Neujahr}{#1}
+%      \termin{\the\year-01-06}{Heilige Drei Könige\\\vspace{-1em}abc}{#1}
+%      \termin{\the\year-02-14}{Valentinstag}{#1}
+%    } {
+%    \ifthenelse{\equal{#1}{\the\year-04-01}}{
+%      \termin{\the\year-04-19}{Karfreitag}{#1}
+%      \termin{\the\year-04-21}{Ostersonntag}{#1}
+%      \termin{\the\year-04-22}{Ostermontag}{#1}
+%      \termin{\the\year-05-12}{Muttertag}{#1}
+%      %\termin{\the\year-05-01}{Tag der Arbeit}{#1}
+%      \termin{\the\year-05-30}{Christi Himmelfahrt}{#1}
+%      \termin{\the\year-06-09}{Pfingstsonntag}{#1}
+%      \termin{\the\year-06-10}{Pfingstmontag}{#1}
+%      \termin{\the\year-06-20}{Fronleichnam}{#1}
+%    } {
+%    \ifthenelse{\equal{#1}{\the\year-07-01}}{} {
+%    \ifthenelse{\equal{#1}{\the\year-10-01}}{
+%      \termin{\the\year-10-03}{Tag der deutschen Einheit}{#1}
+%      \termin{\the\year-10-31}{Halloween}{#1}
+%      \termin{\the\year-11-01}{Allerheiligen}{#1}
+%      \termin{\the\year-12-24}{Heilig Abend}{#1}
+%      \termin{\the\year-12-25}{1.\ Weihnachtsfeiertag}{#1}
+%      \termin{\the\year-12-26}{2.\ Weihnachtsfeiertag}{#1}
+%      \termin{\the\year-12-31}{Silvester}{#1}
+%    }}}}
+    \end{tikzpicture}
+  \end{center}
+  \newpage
+}
+
+
+
+\def\Expr#1{\the\numexpr #1\relax}
+
+\def\Modulonumber#1#2{\Expr{#2-((((#2+(#1/2))/#1)-1)*#1)}}
+\def\Divisionnumber#1#2{\Expr{(2*#2-#1)/(2*#1)}}
+
+\def\Mod#1#2{\Modulonumber{\Expr{#2}}{\Expr{#1}}}
+\def\Div#1#2{\Divisionnumber{\Expr{#2}}{\Expr{#1}}}
+
+\def\Jday#1#2#3%
+    {\Expr{#1+\Div{((153*(\Expr{#2+(12*(\Div{14-#2}{12}))-3}))+2)}
+     {5}+365*(\Expr{#3+4800-(\Div{14-#2}{12})})+
+      (\Div{\Expr{#3+4800-(\Div{14-#2}{12})}}{4})-
+      (\Div{\Expr{#3+4800-(\Div{14-#2}{12})}}{100})+
+      (\Div{\Expr{#3+4800-(\Div{14-#2}{12})}}{400})-32045 }}
+
+\def\cwhlp#1#2#3%
+    {\Expr{\Mod {\Mod {\Mod {\Expr
+     {\Jday{#1}{#2}{#3}+31741-\Mod{\Jday{#1}{#2}{#3}}{7}}}%
+     {146097}}{36524}}{1461}}}
+
+\def\calendarweek#1#2#3%
+  {\Expr{\Expr{\Div{\Expr{\Mod{\cwhlp{#1}{#2}{#3}-
+    \Expr{\Div{\cwhlp{#1}{#2}{#3}}{1460}}}{365}+
+         \Expr{\Div{\cwhlp{#1}{#2}{#3}}{1460}}}}{7} +1}}}
+
+\newcommand{\calhead}[2]{\begin{flushright}\textcolor{gray!100}{#1~#2}\end{flushright}\vspace{0.5em}}
+
+\newcommand{\weekplan}[1]{
+  \newpage
+  \begin{landscape}
+    \textbf{#1:}\\
+    
+    \addvbuffer[0pt 0pt]
+    {\rowcolors{2}{white}{white}
+    \begin{tabular*}{\columnwidth}[c]{@{\extracolsep{\stretch{1}}}*{6}{|c}|@{}}
+      \hline
+      Zeit & Montag & Dienstag & Mittwoch & Donnerstag & Freitag\\\hline
+      \thead{8:00\\-\\9:30} & & & & &\\[30pt]\hline
+      \thead{9:45\\-\\11:15} & & & & &\\[30pt]\hline
+      \thead{11:30\\-\\13:00} & & & & &\\[30pt]\hline
+      \thead{14:00\\-\\15:30} & & & & &\\[30pt]\hline
+      \thead{15:45\\-\\17:15} & & & & &\\[30pt]\hline
+      \thead{17:30\\-\\19:00} & & & & &\\[30pt]\hline
+    \end{tabular*}}
+  \end{landscape}
+}
+
+\newcommand{\contactblock}{
+  \\
+  Telefon:~\rule{0.85\textwidth}{0.5pt}\\[3pt]
+  Adresse:~\rule{0.85\textwidth}{0.5pt}
+  \vspace{10pt}
+}
+
+\newcounter{bulletct}
+\newcommand{\contacts}[1]{
+  \newpage
+  {\large Kontakte:}
+  \vspace{6pt}
+  {\scriptsize\forloop{bulletct}{0}{\value{bulletct}<#1}{ \contactblock }}
+}
+
+
+\newcommand{\birthdaypage}{
+  \edef\vlinesep{53mm}
+  \newpage
+  {\textbf{\large{Geburtstage}}}%
+  \vspace{5pt}
+  \begin{tabular}{|*2{p{\dimexpr0.46\textwidth-2\tabcolsep\relax}|}}
+    \hline
+    \textbf{Januar} &
+    \textbf{Februar}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{Maerz} &
+    \textbf{April}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{Mai} &
+    \textbf{Juni}\\\hline
+    & \\[\vlinesep]\hline
+  \end{tabular}%
+  
+  \newpage
+  {\textbf{\large{Geburtstage}}}%
+  \vspace{5pt}
+  \begin{tabular}{|*2{p{\dimexpr0.46\textwidth-2\tabcolsep\relax}|}}
+    \hline
+    \textbf{Juli} &
+    \textbf{August}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{September} &
+    \textbf{Oktober}\\\hline
+    & \\[\vlinesep]\hline
+    \textbf{November} &
+    \textbf{Dezember}\\\hline
+    & \\[\vlinesep]\hline
+  \end{tabular}%
+}
+
+\newcommand{\notetable}[1]{
+  \vspace{4pt}
+  \noindent {\sffamily\large Notizen:\\}%
+  \vspace{12pt}%
+  
+  \rowcolors{2}{blue!25}{white}
+  \hspace{-8pt}\begin{tabularx}{0.93\textwidth}{X}
+    \forloop{bulletct}{0}{\value{bulletct}<#1}{ \\ }
+  \end{tabularx}
+}
+
+\newcommand{\notes}[3][\empty]{%
+  \newpage
+  \noindent{\large Notizen:}\\[10pt]
+  \foreach \n in {1,...,#2}{%
+    \ifthenelse{\equal{#1}{\empty}}
+      {\rule{0.94\textwidth}{0.5pt}\\}
+      {\rule{0.94\textwidth}{0.5pt}\vspace{#1}\\}
+  }
+}
+
+\newcommand{\blanknotes}[1]{
+  \forloop{bulletct}{0}{\value{bulletct}<#1}{
+    \newpage
+    \noindent{\large\raggedright Notizen:}\\[10pt]
+  }
+}
+
+\newcommand{\showcell}[2]{
+  \rowcolors{2}{white}{blue!25}
+  \begin{tabular}{p{\dimexpr#1\textwidth-2\tabcolsep\relax}}
+    %\comparedate
+    \forloop{bulletct}{0}{\value{bulletct}<#2}{ \\ }
+  \end{tabular}
+  \rowcolors{2}{white}{white}
+  \vspace{-3pt}
+}
+
+\newcommand{\hpadd}{0}
+
+\newcommand{\showweek}[1]{
+  \newpage
+  \edef\xwidth{0.28}
+  \edef\cellrows{10}
+  %\begingroup
+  {\raggedright
+  \sffamily
+  {\textbf{\large{\today~--~\AdvanceDate[6]\today,~KW #1}}}%
+  \vspace{3pt}
+  \begin{tabular}{|*3{p{\dimexpr0.31\textwidth-2\tabcolsep\relax}|}}
+    \hline
+    \cellcolor{accent_yellow}
+    \textcolor{white}{\showdate} &
+    \cellcolor{accent_orange}
+    \AdvanceDate[1]\textcolor{white}{\showdate} &
+    \cellcolor{accent_red}
+    \AdvanceDate[2]\textcolor{white}{\showdate}
+    \\\hline
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows}
+    \\[\hpadd\normalbaselineskip]\hline
+    \cellcolor{accent_magenta}
+    \AdvanceDate[3]\textcolor{white}{\showdate} &
+    \cellcolor{accent_violet}
+    \AdvanceDate[4]\textcolor{white}{\showdate} &
+    \cellcolor{accent_blue}
+    \AdvanceDate[5]\textcolor{white}{\showdate}
+    \\\hline
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows}
+    \\[\hpadd\normalbaselineskip]\hline
+    \cellcolor{accent_cyan}
+    \AdvanceDate[6]\textcolor{white}{\showdate} &
+    \cellcolor{accent_green}
+    \textcolor{white}{Aufgaben:} &
+    \cellcolor{accent_green}
+    \\\hline                                             
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows} &
+    \showcell{\xwidth}{\cellrows}
+    \\[\hpadd\normalbaselineskip]\hline
+  \end{tabular}%
+  
+  \notetable{6}
+  }
+}
+
+\newcounter{daycounter}

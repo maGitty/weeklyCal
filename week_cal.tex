@@ -10,8 +10,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % specify these two dates %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-\year=2021
-\def\firstMonday{28/09/2020}
+\year=2022
+\def\firstMonday{25/10/2021}
 
 \include{wraps/forematter}
 \include{wraps/predefs}
@@ -34,16 +34,16 @@
 
 %\usedate{31/12/\the\year}
 
-\includepdf[scale=.94,pagecommand={
-  \vspace*{25mm}
-  \begin{center}
-    \textcolor{white}{\Huge\textbf{weekly \prevyear/\the\year}}
-  \end{center}
-  }]{bulb8}
-
-\newpage
-\clearpage~
-\newpage
+%\includepdf[scale=.94,pagecommand={
+%  \vspace*{25mm}
+%  \begin{center}
+%    \textcolor{white}{\Huge\textbf{weekly \prevyear/\the\year}}
+%  \end{center}
+%  }]{bulb8}
+%
+%\newpage
+%\clearpage~
+%\newpage
 
 \begin{center}
 
@@ -82,17 +82,17 @@
 \contacts{17}%
 \contacts{17}%
 
-\forloop{bulletct}{0}{\value{bulletct}<5}{ \notes{44}{\textwidth} }
+\forloop{bulletct}{0}{\value{bulletct}<4}{ \notes{44}{\textwidth} }
 
 \end{center}
 
-\blanknotes{5}
+\blanknotes{4}
 
 \scriptsize
 
 \begin{center}
 \weekplan{WS \prevyear /\the\year}%
-\weekplan{SS \the\year /\nextyear}%
+\weekplan{SS \the\year}%
 \end{center}
 
 \end{document}

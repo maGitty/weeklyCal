@@ -1,10 +1,41 @@
-\documentclass[a4paper]{article}
+\documentclass[a6paper]{article}
 
 \usepackage{graphicx}
 \pagenumbering{gobble}
 \usepackage{pdfpages}
+\usepackage[abs]{overpic}
+\usepackage{pict2e}
+\usepackage{tikz}
+\usepackage[outline]{contour}
+\contourlength{1.6pt}
+\usepackage[default]{comfortaa}
+\usepackage[T1]{fontenc}
+\usepackage{fontawesome}
+
+\newcommand\BackgroundPic{%
+\put(0,0){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+\includegraphics[width=\paperwidth,keepaspectratio]{background.jpg}%
+\vfill
+}}}
+
 
 \begin{document}
-\includepdf[offset=0 200,angle=90,scale=.7]{bulb8}
-~\newpage
+\AddToShipoutPicture*{\BackgroundPic}
+\fontsize{40}{60}
+\vspace*{18mm}\hspace{-19mm}\contour{white}{\textbf{WEEKLY}}
+\contour{white}{}\\~\\
+\hspace*{-13.5mm}\contour{white}{\Huge 2020/2021}\hspace{10mm}
+
+%\LARGE
+%\begin{tikzpicture}
+%  \node[inner sep = -15mm] (a) {\includegraphics[width=105mm,angle=90]{background.jpg}};
+%  \node[outer sep=0mm,rotate=90,text width=40mm,align=center] at (-3.,-2.1) {\contour{white}{\textbf{WEEKLY}}};
+%  \node[outer sep=0mm,rotate=90,text width=40mm,align=center] at (-2.3,-2.08) {\contour{white}{\textbf{2020/2021}}};
+%\end{tikzpicture}
+
+%\includepdf[offset=0 200,angle=90,scale=.7]{bulb8}
+%~\newpage~\newpage
 \end{document}
